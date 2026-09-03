@@ -1236,8 +1236,43 @@ input[type=range]{accent-color:#e92d2b!important}
  .fgrp{width:100%}.ctrls .fgrp{justify-content:space-between}
  .fx-search{width:100%}
  .sldr-box{width:100%}.sldr-box .slider{width:100%!important}
- .hdr-sc{width:100%;margin:6px 0 0}
+ .hdr-sc{width:auto;margin:0}
 }
+/* compact header: keep toggle on the title line */
+.hdr-compact{flex-wrap:nowrap;align-items:center;gap:8px}
+.hdr-compact .logo-t{white-space:nowrap}
+.hdr-compact .tab-btn{padding:6px 11px!important;font-size:12px!important}
+.hdr-compact .hdr-sc .seg button{padding:4px 9px!important;font-size:11px!important}
+@media(max-width:640px){.hdr-compact .logo-t{font-size:15px}.hdr-compact .tab-btn{padding:5px 8px!important;font-size:10.5px!important}}
+/* game switcher dropdown */
+.gswitch-btn{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.4);color:#fff;font-weight:800;font-size:10.5px;border-radius:7px;padding:5px 12px;cursor:pointer}
+.gswitch-pop{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;z-index:60;background:var(--bg1);border:1px solid var(--brd);border-radius:10px;padding:8px;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:300px;overflow-y:auto;width:min(92vw,560px);box-shadow:0 10px 30px rgba(0,0,0,.6)}
+/* player tiles: keep name on one line */
+.pt-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptile .avail{width:14px;height:14px;font-size:9px}
+@media(max-width:640px){
+ .ptile{padding:6px 8px!important;gap:6px!important}
+ .pt-name{font-size:12.5px!important}
+ .pt-meta{font-size:9px!important}
+ .seg.oneline button{font-size:9.5px!important;padding:4px 6px!important}
+ .flbl{font-size:9px!important;margin-bottom:2px}
+ .tcol-h b{font-size:12px}
+ .ins-tile{flex:0 0 66%!important;max-width:255px!important;min-height:62px!important}
+ .ins-r{padding:7px 9px!important;gap:0!important}
+ .ins-name{font-size:11.5px!important}
+ .ins-mkt{font-size:9.5px!important}
+ .ins-stat{font-size:9px!important;line-height:1.25!important}
+ .ins-l{flex:0 0 52px!important}
+ .bkchip b{font-size:10px}
+ .modal .logtbl{font-size:8.5px}
+ .modal .logtbl td,.modal .logtbl th{padding:3px 4px!important}
+ .modal .fr-l{font-size:11px}
+ .modal .fr-desc{font-size:9px}
+ .fhub .subtab{font-size:10px!important;padding:5px 7px!important}
+}
+.tlog-title{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tlog-sel{background:rgba(0,0,0,.28);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:6px;font-size:10px;font-weight:700;padding:3px 6px;cursor:pointer;margin-left:auto;flex:0 0 auto}
+.logtbl.wide td.c-tm,.logtbl.wide th.c-tm{min-width:66px}
 /* wide (auto-layout) log tables so TD columns + team chips + names aren't clipped */
 .logtbl.wide{table-layout:auto;width:auto;min-width:100%}
 .logtbl.wide th,.logtbl.wide td{white-space:nowrap;overflow:visible;text-overflow:clip;word-break:normal;padding:4px 8px}
@@ -1247,6 +1282,11 @@ input[type=range]{accent-color:#e92d2b!important}
 .seg.wrap{flex-wrap:wrap}
 .seg.oneline.wrap{flex-wrap:wrap}
 .seg.fw{display:flex;flex-wrap:wrap;width:100%}
+.seg.fitw{display:flex;width:100%}.seg.fitw button{flex:1 1 0;min-width:0}
+.sc-opt{font-size:10px;font-weight:800;padding:6px 4px;border-radius:7px;border:1px solid var(--brd);background:var(--bg1);color:#cfd6df;cursor:pointer;text-align:center;line-height:1.25}
+.sc-opt .sub{font-weight:700}
+.sc-opt.on{background:#e92d2b;border-color:#e92d2b;color:#fff}
+.sc-opt.on .sub{color:rgba(255,255,255,.85)}
 .todd2{display:inline-flex;align-items:center;gap:2px;padding:1px 6px;background:rgba(43,237,139,.10);border:1px solid rgba(43,237,139,.32);border-radius:6px;font-size:10px;font-weight:800;color:#2bed8b;vertical-align:middle}
 .propstrip{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:12px;padding:7px 9px;background:var(--bg2);border:1px solid var(--brd);border-radius:8px}
 .propchip{font-size:10px;font-weight:700;background:var(--bg1);border:1px solid var(--brd);border-radius:5px;padding:2px 7px;color:#e8eef5}
@@ -1780,15 +1820,17 @@ function PlayerTile({p, sk, tab, period, side, onOpen, fantasy, factorPred, qN})
   const posLbl=p.depthRank||p.pos||'';
   const inj=p.inj&&p.inj!=='Active'?p.inj:'';
   const oddV=fantasy?null:(qMode?qTileOdds(sk,tab,p.pid,qN):tileOdds(sk,tab,p.pid));
-  const thLbl=(!fantasy&&tab)?((qMode?'Q'+qN+' ':'')+tab.label):'';
-  const meta=html`<small style=${{color:'var(--t3)'}}><b style=${{color:'#e6ecf3'}}>${posLbl}</b>${thLbl?html` · <span style=${{color:'#cfd6df',fontWeight:700}}>${thLbl}</span>`:''}${oddV?html` · <span className="odds-grn">$${oddV.toFixed(2)} (SB)</span>`:''}${inj?html` · <span style=${{color:injColor(inj,false),fontWeight:700}}>${inj}</span>`:''}</small>`;
-  const sr=html`<div className="ptile-sr" style=${{display:'flex',flexDirection:'column',alignItems:team2?'flex-start':'flex-end',minWidth:52}}>
-    ${hr.pct==null?html`<span className="sub">—</span>`:html`<span className=${'hr '+srClass(hr.pct)} style=${{fontSize:16}}>${pctv(hr.hits,hr.n)}%</span><span className="sub" style=${{fontSize:9}}>${hr.hits}/${hr.n}</span>`}
+  let thLbl='';
+  if(!fantasy&&tab){ if(tab.k==='ou'){ const ln=qMode?qLine(p.pid,sk,qN):playerLine(p.pid,sk); thLbl=(qMode?'Q'+qN+' ':'')+'O/U'+(ln!=null?' '+ln:''); } else thLbl=(qMode?'Q'+qN+' ':'')+tab.label; }
+  const brd=hr.pct==null?hexA(clr,0.4):srVar(hr.pct);
+  const meta=html`<small className="pt-meta" style=${{color:'var(--t3)',display:'flex',alignItems:'center',gap:4,flexWrap:'wrap',justifyContent:team2?'flex-end':'flex-start'}}><b style=${{color:'#e6ecf3'}}>${posLbl}</b>${thLbl?html`<span style=${{color:'#cfd6df',fontWeight:700}}>· ${thLbl}</span>`:''}${oddV?html`<span className="odds-grn">· $${oddV.toFixed(2)} (SB)</span>`:''}<${AvailIcon} inj=${p.inj}/></small>`;
+  const sr=html`<div className="ptile-sr" style=${{display:'flex',flexDirection:'column',alignItems:team2?'flex-start':'flex-end',minWidth:46}}>
+    ${hr.pct==null?html`<span className="sub">—</span>`:html`<span className=${'hr '+srClass(hr.pct)} style=${{fontSize:15}}>${pctv(hr.hits,hr.n)}%</span><span className="sub" style=${{fontSize:8.5}}>${hr.hits}/${hr.n}</span>`}
   </div>`;
   const info=html`<div className="ptile-info" style=${{flex:1,minWidth:0,textAlign:team2?'right':'left'}}>
-    <div className="pn2" style=${{display:'block'}}>${p.name}</div>${meta}</div>`;
+    <div className="pn2 pt-name" style=${{display:'block',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>${abbrName(p.name)}</div>${meta}</div>`;
   const bdg=html`<${Badge} s=${teamShort} cls="sm"/>`;
-  return html`<div className="ptile" style=${{cursor:'pointer',display:'flex',alignItems:'center',gap:8,background:`linear-gradient(${team2?'270deg':'90deg'},${hexA(clr,0.24)},${hexA(clr,0.05)})`,borderColor:hexA(clr,0.35)}} onClick=${()=>onOpen(p,sk,tab&&tab.k)}>
+  return html`<div className="ptile" style=${{cursor:'pointer',display:'flex',alignItems:'center',gap:8,background:`linear-gradient(${team2?'270deg':'90deg'},${hexA(clr,0.24)},${hexA(clr,0.05)})`,borderColor:brd,borderWidth:'1.5px'}} onClick=${()=>onOpen(p,sk,tab&&tab.k)}>
     ${team2?html`${sr}${info}${bdg}`:html`${bdg}${info}${sr}`}
   </div>`;
 }
@@ -1828,9 +1870,10 @@ function StatsTab({game, onOpen, statOrder, initStat, fantasy}){
     list.forEach(p=>{p._home=game.home;p._away=game.away;});
     const rankFor=p=>{const rows=periodRows(p.gl,period).filter(statFacPred(game,p,factor));if(!rows.length)return -1;const ptdMap=(skEff==='td')?tdPtdMap(p.pid):null;let h=0;rows.forEach(r=>{if(qMode?qTileHit(skEff,tab,r,p.pid,qN):tileHit(skEff,tab,r,p.pid,ptdMap))h++;});return h/rows.length;};
     list=list.map(p=>({p,r:rankFor(p)})).sort((a,b)=>b.r-a.r);
+    const isHomeCol=sideKey==='home'; const cc=color(teamShort);
     return html`<div className="tcol">
-      <div className="tcol-h" style=${{background:`linear-gradient(90deg,${hexA(color(teamShort),0.92)},${hexA(color(teamShort),0.35)})`,color:txtOn(color(teamShort)),display:'flex',alignItems:'center',gap:6,padding:'7px 10px',borderRadius:8,marginBottom:8}}>
-        <${Badge} s=${teamShort} cls="xs"/> <b>${teamShort}</b> <span className="sub" style=${{marginLeft:'auto',opacity:.85}}>ranked by strike rate</span></div>
+      <div className="tcol-h" style=${{background:`linear-gradient(${isHomeCol?'270deg':'90deg'},${hexA(cc,0.92)},${hexA(cc,0.35)})`,color:txtOn(cc),display:'flex',alignItems:'center',gap:6,padding:'7px 10px',borderRadius:8,marginBottom:8,justifyContent:isHomeCol?'flex-end':'flex-start'}}>
+        ${isHomeCol?html`<b>${nick(teamShort)}</b> <${Badge} s=${teamShort} cls="xs"/>`:html`<${Badge} s=${teamShort} cls="xs"/> <b>${nick(teamShort)}</b>`}</div>
       <div style=${{display:'flex',flexDirection:'column',gap:5}}>
         ${list.length?list.map(o=>html`<${PlayerTile} key=${o.p.name} p=${o.p} sk=${skEff} tab=${tab} period=${period} side=${sideKey} onOpen=${onOpen} fantasy=${fantasy} factorPred=${statFacPred(game,o.p,factor)} qN=${qN}/>`):html`<div className="sub" style=${{padding:12,textAlign:'center'}}>No players with ${qMode?('Q'+qN+' '):''}${STATS[skEff].short} odds.</div>`}
       </div>
@@ -1842,12 +1885,12 @@ function StatsTab({game, onOpen, statOrder, initStat, fantasy}){
   return html`<div>
     <div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',marginBottom:6}}>
       <div className="fgrp"><span className="flbl">${fantasy?'Scoring':'Stat'}</span><${Seg} cls="oneline" items=${items} value=${skEff} onChange=${changeStat}/></div>
-      <div className="fgrp"><span className="flbl">Period</span><${Seg} items=${PERIODS} value=${period} onChange=${setPeriod}/></div>
       ${fantasy?'':html`<div className="fgrp"><span className="flbl">Factor</span><${Seg} cls="oneline" items=${facItems} value=${factor} onChange=${setFactor}/></div>`}
-      ${fantasy?'':html`<div className="fgrp"><span className="flbl">Time</span><${Seg} cls="oneline" items=${timeItems} value=${time} onChange=${changeTime}/></div>`}
     </div>
-    <div className="ctrls" style=${{display:'flex',justifyContent:'center',marginBottom:14}}>
-      <div className="fgrp" style=${{flex:1,maxWidth:640}}><span className="flbl">Line</span><${Seg} cls="oneline wrap" items=${tabs.map(t=>[t.k,t.label])} value=${tab.k} onChange=${setTabK}/></div>
+    <div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:'8px',justifyContent:'center',alignItems:'flex-start',marginBottom:14}}>
+      <div className="fgrp" style=${{flex:1,minWidth:200,maxWidth:520}}><span className="flbl">${qMode?'Threshold':'Line'}</span><${Seg} cls="oneline wrap" items=${tabs.map(t=>[t.k,t.label])} value=${tab.k} onChange=${setTabK}/></div>
+      <div className="fgrp"><span className="flbl">Period</span><${Seg} items=${PERIODS} value=${period} onChange=${setPeriod}/></div>
+      ${fantasy?'':html`<div className="fgrp"><span className="flbl">Time</span><${Seg} cls="oneline" items=${timeItems} value=${time} onChange=${changeTime}/></div>`}
     </div>
     <div className="cols2"><${Column} sideKey="away"/><${Column} sideKey="home"/></div>
   </div>`;
@@ -1938,55 +1981,109 @@ const _pl=v=>v!=null?('$'+(+v).toFixed(2)):null;
 const qpF=(r,qi)=>r.q[qi], qpA=(r,qi)=>r.oq[qi], qtF=(r,qi)=>r.qtd[qi], qtA=(r,qi)=>r.oqtd[qi];
 const hpF=(r,hn)=>hn===1?r.h1:r.h2, hpA=(r,hn)=>hn===1?r.oh1:r.oh2;
 const htF=(r,hn)=>hn===1?(r.qtd[0]+r.qtd[1]):(r.qtd[2]+r.qtd[3]), htA=(r,hn)=>hn===1?(r.oqtd[0]+r.oqtd[1]):(r.oqtd[2]+r.oqtd[3]);
-function teamMarketRows(time,qH,qA,game,od,st){
-  const rows=[]; od=od||{};
-  const push=(key,label,fh,fa,oh,oa)=>rows.push({key,label,hp:tmRate(qH,fh),ap:tmRate(qA,fa||fh),oh,oa});
-  const spType=st.spType, raceX=+st.raceX;
+function idxNear(arr,t){let bi=0;for(let i=0;i<arr.length;i++)if(Math.abs(arr[i]-t)<Math.abs(arr[bi]-t))bi=i;return bi;}
+function teamMarketRows(time,qH,qA,game,od){
+  const rows=[]; od=od||{}; const H=abbr(game.home), A=abbr(game.away);
+  // plain %|label|% row
+  const P=(key,label,fh,fa)=>rows.push({key,label,hp:tmRate(qH,fh),ap:tmRate(qA,fa||fh)});
+  // slider row: ladder of values, oh/oa arrays (home/away odds per value), hit(v)->{h,a} preds
+  const S=(key,vals,oh,oa,def,fmt,hit)=>rows.push({key,sl:{vals,oh,oa,def,fmt,hit}});
+  // scoring row: options [{tm,ty}], oddsFor(tm,ty), predFor(tm,ty)->{h,a}
+  const SC=(key,tag,opts,oddsFor,predFor)=>rows.push({key,sc:{tag,opts,oddsFor,predFor}});
+  const scoreOpts=[[game.away,'TD'],[game.away,'FG'],[game.away,'SFTY'],[game.home,'TD'],[game.home,'FG'],[game.home,'SFTY']];
   if(time==='match'){
-    const tm=od.teamMkt||{home:{},away:{}};
-    push('win','WON',r=>r.tf>r.ta,null, od.ml&&_pl(od.ml.home), od.ml&&_pl(od.ml.away));
-    push('w14','WON 14+',r=>r.tf-r.ta>=14,null,_pl(tm.home.win14),_pl(tm.away.win14));
-    push('w113','WON 1-13',r=>r.tf>r.ta&&r.tf-r.ta<=13,null,_pl(tm.home.win113),_pl(tm.away.win113));
-    push('l113','LOST 1-13',r=>r.ta>r.tf&&r.ta-r.tf<=13,null);
-    push('l14','LOST 14+',r=>r.ta-r.tf>=14,null);
+    const tm=od.teamMkt||{home:{},away:{}}; const sp=od.spread||{}; const tot=od.total;
+    const hLine=sp.home&&sp.home.line!=null?sp.home.line:-3;
+    const altS=od.altSpread&&od.altSpread.length?od.altSpread:null;
+    const lv=altS?altS.map(x=>x.line):synth(Math.round(hLine),16,1); const lpr=altS?altS.map(x=>x.price):null;
+    P('win','WON',r=>r.tf>r.ta);
+    S('line',lv,lpr,null,idxNear(lv,hLine),v=>H+' '+(v>0?'+':'')+v+' LINE',v=>({h:r=>(r.tf-r.ta)+v>0,a:r=>(r.tf-r.ta)-v>0}));
+    const altT=od.altTotal&&Object.keys(od.altTotal).length?od.altTotal:null;
+    const tv=altT?Object.keys(altT).map(Number).sort((x,y)=>x-y):synth(Math.round(tot?tot.line:44),16,1);
+    const tOv=altT?tv.map(v=>altT[v]&&altT[v].over):null, tUn=altT?tv.map(v=>altT[v]&&altT[v].under):null;
+    S('total',tv,tOv,tUn,idxNear(tv,tot?tot.line:44),v=>'TOTAL O'+v,v=>({h:r=>(r.tf+r.ta)>v,a:r=>(r.tf+r.ta)>v}));
+    P('w14','WON 14+',r=>r.tf-r.ta>=14);
+    P('w113','WON 1-13',r=>r.tf>r.ta&&r.tf-r.ta<=13);
+    P('l113','LOST 1-13',r=>r.ta>r.tf&&r.ta-r.tf<=13);
+    P('l14','LOST 14+',r=>r.ta-r.tf>=14);
     const totd=od.totalTD?od.totalTD.line:4.5;
-    push('ttd','TOTAL TDS O'+totd,r=>(r.td+r.otd)>totd,null, od.totalTD&&_pl(od.totalTD.over), od.totalTD&&_pl(od.totalTD.under));
-    push('team_td','TEAM 2+ TDS',r=>r.td>=2,null);
-    push('opp_td','OPP 2+ TDS',r=>r.otd>=2,null);
-    push('race','RACE TO '+raceX,r=>r.raceW[''+raceX]===1,null, tm.home['race'+raceX]?_pl(tm.home['race'+raceX]):null, tm.away['race'+raceX]?_pl(tm.away['race'+raceX]):null);
-    push('first','SCORE FIRST',r=>r.fs===1,null,_pl(tm.home.firstScore),_pl(tm.away.firstScore));
-    push('fsp','1ST SCORE '+spType,r=>r.gfsT===game.home&&r.gfsY===spType,r=>r.gfsT===game.away&&r.gfsY===spType, od.fsp&&_pl(od.fsp.home[spType]), od.fsp&&_pl(od.fsp.away[spType]));
-    push('lsp','LAST SCORE '+spType,r=>r.glsT===game.home&&r.glsY===spType,r=>r.glsT===game.away&&r.glsY===spType, od.lsp&&_pl(od.lsp.home[spType]), od.lsp&&_pl(od.lsp.away[spType]));
+    P('ttd','TOTAL TDS O'+totd,r=>(r.td+r.otd)>totd);
+    const ttl=(od.teamTot&&od.teamTot.home&&od.teamTot.home.line)||24.5, atl=(od.teamTot&&od.teamTot.away&&od.teamTot.away.line)||20.5;
+    P('team_td',H+' O2.5 TDS',r=>r.td>2.5);
+    P('opp_td',A+' O2.5 TDS',r=>r.otd>2.5);
+    P('team_pts',H+' O'+ttl+' PTS',r=>r.tf>ttl,r=>r.ta>ttl);
+    P('opp_pts',A+' O'+atl+' PTS',r=>r.ta>atl,r=>r.tf>atl);
+    const rvals=[5,10,15,20];
+    S('race',rvals,rvals.map(x=>tm.home['race'+x]),rvals.map(x=>tm.away['race'+x]),1,v=>'RACE TO '+v,v=>({h:r=>r.raceW[''+v]===1,a:r=>r.raceW[''+v]===1}));
+    P('first','SCORE FIRST',r=>r.fs===1,r=>r.fs===1);
+    SC('fsp','1ST SCORE',scoreOpts,(tm2,ty)=>{const s=od.fsp&&od.fsp[tm2===game.home?'home':'away'];return s?s[ty]:null;},(tm2,ty)=>({h:r=>r.gfsT===tm2&&r.gfsY===ty,a:r=>r.gfsT===tm2&&r.gfsY===ty}));
+    SC('lsp','LAST SCORE',scoreOpts,(tm2,ty)=>{const s=od.lsp&&od.lsp[tm2===game.home?'home':'away'];return s?s[ty]:null;},(tm2,ty)=>({h:r=>r.glsT===tm2&&r.glsY===ty,a:r=>r.glsT===tm2&&r.glsY===ty}));
   } else if(time[0]==='q'){
     const qi=(+time[1])-1; const Q=(od.q&&od.q[''+(qi+1)])||{}; const hl=Q.hcap?Q.hcap.line:null;
-    const totKeys=Q.tot?Object.keys(Q.tot).map(Number).sort((x,y)=>x-y):[]; const tl=totKeys.length?totKeys[Math.floor(totKeys.length/2)]:null; const tO=tl!=null?Q.tot[tl]:null;
-    push('win','WON Q'+(qi+1),r=>qpF(r,qi)>qpA(r,qi),null, Q.win&&_pl(Q.win.home), Q.win&&_pl(Q.win.away));
-    if(hl!=null) push('hcap','HCAP '+(hl>0?'+':'')+hl,r=>(qpF(r,qi)-qpA(r,qi))+hl>0,r=>(qpF(r,qi)-qpA(r,qi))-hl>0, Q.hcap&&_pl(Q.hcap.home), Q.hcap&&_pl(Q.hcap.away));
-    if(tl!=null) push('tot','TOTAL O'+tl,r=>(qpF(r,qi)+qpA(r,qi))>tl,null, tO&&_pl(tO.over), tO&&_pl(tO.under));
-    push('qtd','QUARTER TD',r=>(qtF(r,qi)+qtA(r,qi))>0,null, Q.td?_pl(Q.td):null, Q.td?_pl(Q.td):null);
-    push('bts','BOTH TEAMS SCORE',r=>qpF(r,qi)>0&&qpA(r,qi)>0,null, Q.bts?_pl(Q.bts):null, Q.bts?_pl(Q.bts):null);
-    push('bts10','BTS 10+ COMBINED',r=>qpF(r,qi)>0&&qpA(r,qi)>0&&(qpF(r,qi)+qpA(r,qi))>=10,null);
+    const totKeys=Q.tot?Object.keys(Q.tot).map(Number).sort((x,y)=>x-y):[];
+    P('win','WON Q'+(qi+1),r=>qpF(r,qi)>qpA(r,qi));
+    if(hl!=null){const lv=synth(Math.round(hl),6,0.5).map(x=>Math.round(x*2)/2);S('hcap',lv,lv.map(v=>Math.abs(v-hl)<0.01?(Q.hcap.home):null),lv.map(v=>Math.abs(v-hl)<0.01?(Q.hcap.away):null),idxNear(lv,hl),v=>H+' '+(v>0?'+':'')+v+' Q'+(qi+1),v=>({h:r=>(qpF(r,qi)-qpA(r,qi))+v>0,a:r=>(qpF(r,qi)-qpA(r,qi))-v>0}));}
+    if(totKeys.length){const tOv=totKeys.map(v=>Q.tot[v].over),tUn=totKeys.map(v=>Q.tot[v].under);S('tot',totKeys,tOv,tUn,Math.floor(totKeys.length/2),v=>'Q'+(qi+1)+' TOTAL O'+v,v=>({h:r=>(qpF(r,qi)+qpA(r,qi))>v,a:r=>(qpF(r,qi)+qpA(r,qi))>v}));}
+    P('qtd','QUARTER TD',r=>(qtF(r,qi)+qtA(r,qi))>0);
+    P('bts','BOTH TEAMS SCORE',r=>qpF(r,qi)>0&&qpA(r,qi)>0);
+    P('bts10','BTS 10+ COMBINED',r=>qpF(r,qi)>0&&qpA(r,qi)>0&&(qpF(r,qi)+qpA(r,qi))>=10);
   } else if(time[0]==='h'){
-    const hn=+time[1]; const H=(od.half&&od.half[''+hn])||{}; const hl=H.hcap?H.hcap.line:null;
-    const totKeys=H.tot?Object.keys(H.tot).map(Number).sort((x,y)=>x-y):[]; const tl=totKeys.length?totKeys[Math.floor(totKeys.length/2)]:null; const tO=tl!=null?H.tot[tl]:null;
-    push('win','WON H'+hn,r=>hpF(r,hn)>hpA(r,hn),null, H.win&&_pl(H.win.home), H.win&&_pl(H.win.away));
-    if(hl!=null) push('hcap','HCAP '+(hl>0?'+':'')+hl,r=>(hpF(r,hn)-hpA(r,hn))+hl>0,r=>(hpF(r,hn)-hpA(r,hn))-hl>0, H.hcap&&_pl(H.hcap.home), H.hcap&&_pl(H.hcap.away));
-    if(tl!=null) push('tot','TOTAL O'+tl,r=>(hpF(r,hn)+hpA(r,hn))>tl,null, tO&&_pl(tO.over), tO&&_pl(tO.under));
-    const tdl=H.totd?H.totd.line:2.5;
-    push('htd','TOTAL TDS O'+tdl,r=>(htF(r,hn)+htA(r,hn))>tdl,null, H.totd?_pl(H.totd.over):null, H.totd?_pl(H.totd.under):null);
-    push('team_htd','TEAM 1+ TD',r=>htF(r,hn)>=1,null);
-    push('team_hpts','TEAM O10 PTS',r=>hpF(r,hn)>10,null);
+    const hn=+time[1]; const HH=(od.half&&od.half[''+hn])||{}; const hl=HH.hcap?HH.hcap.line:null;
+    const totKeys=HH.tot?Object.keys(HH.tot).map(Number).sort((x,y)=>x-y):[];
+    P('win','WON H'+hn,r=>hpF(r,hn)>hpA(r,hn));
+    if(hl!=null){const lv=synth(Math.round(hl),8,0.5).map(x=>Math.round(x*2)/2);S('hcap',lv,lv.map(v=>Math.abs(v-hl)<0.01?HH.hcap.home:null),lv.map(v=>Math.abs(v-hl)<0.01?HH.hcap.away:null),idxNear(lv,hl),v=>H+' '+(v>0?'+':'')+v+' H'+hn,v=>({h:r=>(hpF(r,hn)-hpA(r,hn))+v>0,a:r=>(hpF(r,hn)-hpA(r,hn))-v>0}));}
+    if(totKeys.length){const tOv=totKeys.map(v=>HH.tot[v].over),tUn=totKeys.map(v=>HH.tot[v].under);S('tot',totKeys,tOv,tUn,Math.floor(totKeys.length/2),v=>'H'+hn+' TOTAL O'+v,v=>({h:r=>(hpF(r,hn)+hpA(r,hn))>v,a:r=>(hpF(r,hn)+hpA(r,hn))>v}));}
+    const tdl=HH.totd?HH.totd.line:2.5;
+    P('htd','H'+hn+' TOTAL TDS O'+tdl,r=>(htF(r,hn)+htA(r,hn))>tdl);
+    P('team_htd',H+' O0.5 TDS',r=>htF(r,hn)>0.5,r=>htA(r,hn)>0.5);
+    P('opp_htd',A+' O0.5 TDS',r=>htA(r,hn)>0.5,r=>htF(r,hn)>0.5);
+    P('team_hpts',H+' O10.5 PTS',r=>hpF(r,hn)>10.5,r=>hpA(r,hn)>10.5);
+    P('opp_hpts',A+' O10.5 PTS',r=>hpA(r,hn)>10.5,r=>hpF(r,hn)>10.5);
+    const rvals=[5,10,15,20];
     if(hn===1){
-      push('race','RACE TO '+raceX,r=>r.raceH1W[''+raceX]===1,null);
-      push('first','SCORE FIRST',r=>r.gh1fsT===game.home,r=>r.gh1fsT===game.away);
-      push('fsp','1ST SCORE '+spType,r=>r.gh1fsT===game.home&&r.gh1fsY===spType,r=>r.gh1fsT===game.away&&r.gh1fsY===spType);
-      push('last','SCORE LAST',r=>r.gh1lsT===game.home,r=>r.gh1lsT===game.away, H.lastTeam?_pl(H.lastTeam.home):null, H.lastTeam?_pl(H.lastTeam.away):null);
+      S('race',rvals,null,null,1,v=>'H1 RACE TO '+v,v=>({h:r=>r.raceH1W[''+v]===1,a:r=>r.raceH1W[''+v]===1}));
+      P('first','SCORE FIRST',r=>r.gh1fsT===game.home,r=>r.gh1fsT===game.away);
+      SC('fsp','1ST SCORE',scoreOpts,(tm2,ty)=>null,(tm2,ty)=>({h:r=>r.gh1fsT===tm2&&r.gh1fsY===ty,a:r=>r.gh1fsT===tm2&&r.gh1fsY===ty}));
+      P('last','SCORE LAST',r=>r.gh1lsT===game.home,r=>r.gh1lsT===game.away);
     } else {
-      const R2=H.race||{};
-      push('race','RACE TO '+raceX,r=>r.raceH2W[''+raceX]===1,null, R2[''+raceX]?_pl(R2[''+raceX].home):null, R2[''+raceX]?_pl(R2[''+raceX].away):null);
+      const R2=HH.race||{};
+      S('race',rvals,rvals.map(x=>R2[''+x]&&R2[''+x].home),rvals.map(x=>R2[''+x]&&R2[''+x].away),1,v=>'H2 RACE TO '+v,v=>({h:r=>r.raceH2W[''+v]===1,a:r=>r.raceH2W[''+v]===1}));
     }
   }
   return rows;
+}
+// interactive market row: away% (left) | label | home% (right), expandable slider/scoring dropdown
+function MarketRow({row,qH,qA,homeShort,awayShort}){
+  const [open,setOpen]=useState(false);
+  const [idx,setIdx]=useState(row.sl?row.sl.def:0);
+  const [sel,setSel]=useState(0);
+  let label,hp,ap,expandable=!!(row.sl||row.sc),oddL=null,oddR=null,dd=null;
+  const pctT=x=>x==null?'':Math.round(x*100)+'%';
+  if(row.sl){ const s=row.sl; const v=s.vals[idx]; const pr=s.hit(v); hp=tmRate(qH,pr.h); ap=tmRate(qA,pr.a); label=s.fmt(v);
+    const oh=s.oh?s.oh[idx]:null, oa=s.oa?s.oa[idx]:null; oddL=oa!=null?_pl(oa):null; oddR=oh!=null?_pl(oh):null;
+    dd=html`<div style=${{padding:'6px 10px'}}><div style=${{display:'flex',alignItems:'center',gap:10}}>
+      <span className="sub">${s.vals[0]}</span>
+      <input type="range" min="0" max=${s.vals.length-1} step="1" value=${idx} onInput=${e=>setIdx(+e.target.value)} className="slider" style=${{flex:1}}/>
+      <span className="sub">${s.vals[s.vals.length-1]}</span></div>
+      <div style=${{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:11,fontWeight:800}}>
+        <span>${awayShort} ${oddL?html`<span className="todd2">${oddL}</span>`:''}</span>
+        <b>${s.fmt(v)}</b>
+        <span>${oddR?html`<span className="todd2">${oddR}</span>`:''} ${homeShort}</span></div></div>`;
+  } else if(row.sc){ const s=row.sc; const o=s.opts[sel]; const pr=s.predFor(o[0],o[1]); hp=tmRate(qH,pr.h); ap=tmRate(qA,pr.a);
+    label=s.tag+' · '+abbr(o[0])+' '+o[1];
+    dd=html`<div style=${{padding:'8px 10px',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6}}>${s.opts.map((op,i)=>{const on=i===sel;const od2=s.oddsFor(op[0],op[1]);return html`<button key=${i} onClick=${e=>{e.stopPropagation();setSel(i);}} className=${'sc-opt'+(on?' on':'')}>${abbr(op[0])} ${op[1]}${od2?html`<span className="sub"> ${_pl(od2)}</span>`:''}</button>`;})}</div>`;
+  } else { label=row.label; hp=row.hp; ap=row.ap; }
+  const hg=hp!=null&&(ap==null||hp>=ap)&&hp>0, ag=ap!=null&&(hp==null||ap>=hp)&&ap>0;
+  return html`<div style=${{padding:'5px 2px',borderBottom:'1px solid rgba(255,255,255,.04)'}}>
+    <div style=${{display:'grid',gridTemplateColumns:'46px 1fr minmax(130px,auto) 1fr 46px',alignItems:'center',gap:8}} onClick=${expandable?()=>setOpen(o=>!o):undefined}>
+      <div style=${{textAlign:'left',fontWeight:800,fontSize:12,color:ag?'var(--acc)':'#fff'}}>${pctT(ap)}</div>
+      <div style=${{height:8,background:'#3a3d47',borderRadius:5,overflow:'hidden',position:'relative'}}><i style=${{position:'absolute',right:0,top:0,bottom:0,width:(ap?Math.round(Math.min(1,ap)*100):0)+'%',background:ag?'var(--acc)':'#5a5d67'}}></i></div>
+      <div style=${{textAlign:'center',fontSize:10,fontWeight:700,color:'#e8eef5',cursor:expandable?'pointer':'default'}}>${label}${expandable?html`<span style=${{color:'#61a4d8',marginLeft:3,fontSize:9}}>${open?'▲':'▼'}</span>`:''}</div>
+      <div style=${{height:8,background:'#3a3d47',borderRadius:5,overflow:'hidden',position:'relative'}}><i style=${{position:'absolute',left:0,top:0,bottom:0,width:(hp?Math.round(Math.min(1,hp)*100):0)+'%',background:hg?'var(--acc)':'#5a5d67'}}></i></div>
+      <div style=${{textAlign:'right',fontWeight:800,fontSize:12,color:hg?'var(--acc)':'#fff'}}>${pctT(hp)}</div>
+    </div>
+    ${open&&dd?dd:''}
+  </div>`;
 }
 const SROWS=[
  {l:'Games',games:1,dec:0},
@@ -2004,14 +2101,16 @@ const SROWS=[
  {l:'Rush Att',m:'ratt',o:'oratt',dec:1},
  {l:'Rush Yds',m:'ryds',o:'oryds',dec:0},
  {l:'Yds/Carry',mr:['ryds','ratt'],or:['oryds','oratt'],dec:1},
- {l:'Reception 1st Down',m:'fdRec',o:'ofdRec',dec:1},
+ {l:'Rec 1st Down',m:'fdRec',o:'ofdRec',dec:1},
  {l:'Rush 1st Down',m:'fdRush',o:'ofdRush',dec:1},
 ];
 function avgField(rows,k){const v=rows.map(r=>r[k]).filter(x=>x!=null);return v.length?v.reduce((s,x)=>s+x,0)/v.length:null;}
 function ratioField(rows,a,b){let sa=0,sb=0;rows.forEach(r=>{if(r[a]!=null&&r[b]!=null){sa+=r[a];sb+=r[b];}});return sb?sa/sb:null;}
-function TeamStatsView({game,rH,rA}){
+const _lmaxC={};
+function lmaxField(key,period){ const ck=key+'|'+period; if(ck in _lmaxC)return _lmaxC[ck]; let mx=0; Object.keys(TLOGS).forEach(t=>{const rows=tlPeriod(TLOGS[t]||[],period);const v=avgField(rows,key);if(v!=null&&v>mx)mx=v;}); _lmaxC[ck]=mx||1; return mx||1; }
+function lmaxRatio(a,b,period){ const ck=a+'/'+b+'|'+period; if(ck in _lmaxC)return _lmaxC[ck]; let mx=0; Object.keys(TLOGS).forEach(t=>{const rows=tlPeriod(TLOGS[t]||[],period);const v=ratioField(rows,a,b);if(v!=null&&v>mx)mx=v;}); _lmaxC[ck]=mx||1; return mx||1; }
+function TeamStatsView({game,rH,rA,period,off,setOff}){
   const h=game.home,a=game.away;
-  const [off,setOff]=useState('home');
   const offTeam=off==='home'?h:a, defTeam=off==='home'?a:h;
   const offRows=off==='home'?rH:rA, defRows=off==='home'?rA:rH;
   const offC=color(offTeam), defC=color(defTeam);
@@ -2019,16 +2118,40 @@ function TeamStatsView({game,rH,rA}){
     if(side==='off')return row.mr?ratioField(rows,row.mr[0],row.mr[1]):avgField(rows,row.m);
     return row.or?ratioField(rows,row.or[0],row.or[1]):avgField(rows,row.o); };
   const fmtv=(v,row)=>v==null?'–':(row.pct?(v*100).toFixed(row.dec)+'%':v.toFixed(row.dec));
+  const lmaxOf=(row,side)=>{ if(row.games)return 1; if(side==='off')return row.mr?lmaxRatio(row.mr[0],row.mr[1],period):lmaxField(row.m,period); return row.or?lmaxRatio(row.or[0],row.or[1],period):lmaxField(row.o,period); };
   const tbtn=(k,t)=>{const on=off===k;const c=color(t);return html`<button key=${k} onClick=${()=>setOff(k)} style=${{display:'flex',alignItems:'center',gap:7,padding:'8px 14px',borderRadius:9,border:'1px solid '+(on?c:'var(--brd)'),background:on?c:'transparent',color:on?txtOn(c):'#cfd6df',fontWeight:800,cursor:'pointer'}}><${Badge} s=${t} cls="xs"/> ${nick(t)} Offence</button>`;};
+  const bar=(frac,clr,rightAlign)=>html`<div style=${{height:8,background:'#3a3d47',borderRadius:5,overflow:'hidden',position:'relative'}}><i style=${{position:'absolute',[rightAlign?'right':'left']:0,top:0,bottom:0,width:Math.round(Math.min(1,frac||0)*100)+'%',background:clr}}></i></div>`;
   return html`<div>
     <div style=${{display:'flex',gap:8,justifyContent:'center',marginBottom:12,flexWrap:'wrap'}}>${tbtn('home',h)}${tbtn('away',a)}</div>
     <div style=${{display:'flex',alignItems:'center',marginBottom:6,gap:6}}>
       <div style=${{flex:1,display:'flex',alignItems:'center',gap:6,padding:'8px 12px',borderRadius:8,background:`linear-gradient(90deg,${offC},${hexA(offC,0)} 96%)`,color:txtOn(offC),fontWeight:800}}><${Badge} s=${offTeam} cls="sm"/> ${nick(offTeam)} Offence</div>
       <div style=${{flex:1,display:'flex',alignItems:'center',gap:6,justifyContent:'flex-end',padding:'8px 12px',borderRadius:8,background:`linear-gradient(270deg,${defC},${hexA(defC,0)} 96%)`,color:txtOn(defC),fontWeight:800}}>${nick(defTeam)} Defence <${Badge} s=${defTeam} cls="sm"/></div>
     </div>
-    ${SROWS.map(row=>{const lv=gv(offRows,row,'off'),rv=gv(defRows,row,'def');const mx=Math.max(lv||0,rv||0)||1;
-      return html`<${Row} key=${row.l} label=${row.l.toUpperCase()} leftTxt=${fmtv(lv,row)} rightTxt=${fmtv(rv,row)} hfrac=${lv?lv/mx:0} afrac=${rv?rv/mx:0} hg=${lv!=null&&lv>=(rv||0)} ag=${rv!=null&&rv>=(lv||0)}/>`;})}
+    ${SROWS.map(row=>{const lv=gv(offRows,row,'off'),rv=gv(defRows,row,'def');const lf=lv/lmaxOf(row,'off'),rf=rv/lmaxOf(row,'def');
+      return html`<div key=${row.l} style=${{display:'grid',gridTemplateColumns:'46px 1fr minmax(120px,auto) 1fr 46px',alignItems:'center',gap:8,padding:'6px 2px'}}>
+        <div style=${{textAlign:'left',fontWeight:800,fontSize:12,color:'#fff'}}>${fmtv(lv,row)}</div>
+        ${row.games?html`<div></div>`:bar(lf,offC,true)}
+        <div style=${{textAlign:'center',fontSize:10.5,fontWeight:700,letterSpacing:'.3px',color:'#e8eef5'}}>${row.l.toUpperCase()}</div>
+        ${row.games?html`<div></div>`:bar(rf,defC,false)}
+        <div style=${{textAlign:'right',fontWeight:800,fontSize:12,color:'#fff'}}>${fmtv(rv,row)}</div>
+      </div>`;})}
   </div>`;
+}
+function logTitle(team,isHome,game,factors){
+  const fac=game.fac||{}; const oppShort=isHome?game.away:game.home; const isFav=fac.favTeam===team;
+  const pre=[],post=[];
+  (factors||[]).forEach(f=>{ if(f==='all')return;
+    if(f==='ha') pre.push(fac.intl?"Int'l":(isHome?'Home':'Away'));
+    else if(f==='dn') pre.push(fac.dn==='N'?'Night':'Day');
+    else if(f==='ro') pre.push(fac.ro==='in'?'Indoor':'Outdoor');
+    else if(f==='div') pre.push('Divisional');
+    else if(f==='dow') pre.push(fac.dow||'');
+    else if(f==='fav') post.push('as '+(isFav?'Favourite':'Underdog'));
+    else if(f==='h2h') post.push('vs '+nick(oppShort));
+    else if(f==='conf') post.push('vs '+confOf(oppShort));
+    else if(f==='oppform') post.push('vs teams '+(((seasonWinPct(oppShort,2025)||0)>=0.5)?'over':'under')+' .500');
+  });
+  return nick(team)+' '+(pre.length?pre.join(' ')+' ':'')+'Games'+(post.length?' '+post.join(' '):'');
 }
 function TeamUnified({game}){
   const h=game.home,a=game.away,H=color(h),A=color(a);
@@ -2037,31 +2160,14 @@ function TeamUnified({game}){
   const [period,setPeriod]=useState('2025');
   const [factors,setFactors]=useState(['all']);
   const [qbH,setQbH]=useState(''); const [qbA,setQbA]=useState('');
-  const [open,setOpen]=useState(null);
   const [logMode,setLogMode]=useState('general');
+  const [offTeam,setOffTeam]=useState('home');
   const [time,setTime]=useState('match');
-  const [raceX,setRaceX]=useState('10');
-  const [spType,setSpType]=useState('TD');
   function toggleFactor(k){ setFactors(prev=>{ if(k==='all')return ['all']; let n=prev.filter(x=>x!=='all'); n=n.includes(k)?n.filter(x=>x!==k):n.concat(k); return n.length?n:['all']; }); }
   const scope=period==='2025'?'2025':'all'; const lmax=LMAX[scope]||{};
   const od=game.odds;
   const homeLine=(od&&od.spread&&od.spread.home&&od.spread.home.line!=null)?od.spread.home.line:-3;
   const totLine=(od&&od.total&&od.total.line!=null)?od.total.line:44;
-  const hImp=(totLine-homeLine)/2, aImp=(totLine+homeLine)/2;
-  // ladders seeded from bookmaker alternate lines where available
-  const altS=(od&&od.altSpread&&od.altSpread.length)?od.altSpread:null;
-  const hcH=altS?altS.map(x=>x.line):synth(Math.round(homeLine),20,1);
-  const hcHpr=altS?altS.map(x=>x.price):null;
-  const altT=(od&&od.altTotal&&Object.keys(od.altTotal).length)?od.altTotal:null;
-  const totKeys=altT?Object.keys(altT).map(Number).sort((x,y)=>x-y):null;
-  const totL=totKeys||synth(Math.round(totLine),20,1);
-  const totPrO=totKeys?totKeys.map(k=>altT[k].over):null, totPrU=totKeys?totKeys.map(k=>altT[k].under):null;
-  const ttH=synth(Math.round(hImp),15,1), ttA=synth(Math.round(aImp),15,1);
-  const [iLine,setILine]=useState(ladderIdx(hcH,homeLine));
-  const [iTot,setITot]=useState(ladderIdx(totL,totLine));
-  const [iHtt,setIHtt]=useState(ladderIdx(ttH,hImp));
-  const [iAtt,setIAtt]=useState(ladderIdx(ttA,aImp));
-  const hsp=hcH[iLine], totV=totL[iTot], httV=ttH[iHtt], attV=ttA[iAtt];
   const baseH=tlPeriod(TLOGS[h]||[],period), baseA=tlPeriod(TLOGS[a]||[],period);
   const qbPred=(team,qb,r)=>{if(!qb)return true;const f=gfac(team,r.season,r.week);return f&&f.qb===qb;};
   const predH=teamRowPred(game,h,true,factors), predA=teamRowPred(game,a,false,factors);
@@ -2069,63 +2175,42 @@ function TeamUnified({game}){
   const rA=baseA.filter(r=>predA(r)&&qbPred(a,qbA,r));
   const qH=tqPeriod((TEAMQ[h]||[]).filter(teamRowPredQ(game,h,true,factors)),period);
   const qA=tqPeriod((TEAMQ[a]||[]).filter(teamRowPredQ(game,a,false,factors)),period);
-  const mktRows=teamMarketRows(time,qH,qA,game,od,{raceX,spType});
-  const pctT=x=>x==null?'':Math.round(x*100)+'%';
+  const mktRows=teamMarketRows(time,qH,qA,game,od);
   const facItems=[['all','All'],['h2h','H2H'],['ha',fac.intl?"Int'l":'H/A'],['fav','Fav/Und'],
     ['dn',fac.dn==='N'?'Night':'Day'],['ro',fac.ro==='in'?'Indoor':'Outdoor'],
     ['conf','vs Conf'],['div','vs Div'],['dow',fac.dow||'DoW'],['oppform','Opp Form']];
   const qbOpts=team=>((DEPTH[team]&&DEPTH[team].QB)||[]).map(x=>({pid:x[4],n:x[1]}));
-  const tpill=(txt)=>html`<span className="todd2">${LOGOS.sportsbet?html`<img src=${LOGOS.sportsbet} alt="SB" style=${{height:10,borderRadius:2,marginRight:2}}/>`:''}${txt}</span>`;
-  const mkRows=[
-    {key:'won',label:'WON',hp:rate(rH,r=>r.res==='W'),ap:rate(rA,r=>r.res==='W')},
-    {key:'line',label:html`LINE ${hsp>0?'+':''}${hsp} ${hcHpr?tpill('$'+(hcHpr[iLine]||0).toFixed(2)):''}`,hp:rate(rH,r=>r.margin+hsp>0),ap:rate(rA,r=>r.margin-hsp>0),adj:true,
-      sl:{ladder:hcH,idx:iLine,setIdx:setILine,hlbl:abbr(h),albl:abbr(a),grn:1,sub:hcHpr?('Sportsbet handicap @ $'+(hcHpr[iLine]||0).toFixed(2)):''}},
-    {key:'total',label:html`TOTAL ${totV} ${totPrO?tpill('O $'+(totPrO[iTot]||0).toFixed(2)+' · U $'+(totPrU[iTot]||0).toFixed(2)):''}`,hp:rate(rH,r=>r.total>totV),ap:rate(rA,r=>r.total>totV),adj:true,
-      sl:{ladder:totL,idx:iTot,setIdx:setITot,hlbl:'Over',albl:'Under',grn:1,sub:totPrO?('Sportsbet O $'+(totPrO[iTot]||0).toFixed(2)+' · U $'+(totPrU[iTot]||0).toFixed(2)):''}},
-    {key:'htt',label:`${abbr(h)} O ${httV}`,hp:rate(rH,r=>r.pf>httV),ap:rate(rA,r=>r.pa>httV),adj:true,
-      sl:{ladder:ttH,idx:iHtt,setIdx:setIHtt,hlbl:abbr(h)+' O',albl:'U'}},
-    {key:'att',label:`${abbr(a)} O ${attV}`,hp:rate(rH,r=>r.pa>attV),ap:rate(rA,r=>r.pf>attV),adj:true,
-      sl:{ladder:ttA,idx:iAtt,setIdx:setIAtt,hlbl:abbr(a)+' O',albl:'U'}},
-  ];
   return html`<div>
     <div className="ctrls" style=${{display:'flex',justifyContent:'center',marginBottom:10}}>
-      <${Seg} items=${[['markets','Team Markets'],['stats','Team Stats']]} value=${mode} onChange=${setMode}/>
+      <${Seg} cls="fitw" items=${[['markets','Team Markets'],['stats','Team Stats']]} value=${mode} onChange=${setMode}/>
     </div>
     <div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:10,justifyContent:'center',alignItems:'flex-start',marginBottom:8}}>
       <div className="fgrp"><span className="flbl">Period</span><${Seg} items=${PERIODS} value=${period} onChange=${setPeriod}/></div>
       <div className="fgrp" style=${{flex:1,maxWidth:560}}><span className="flbl">Factors</span><${MultiSeg} items=${facItems} values=${factors} onToggle=${toggleFactor}/></div>
     </div>
     <div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:10,justifyContent:'center',marginBottom:12}}>
-      <div className="fgrp"><span className="flbl">${abbr(h)} QB</span><select className="fx-search" style=${{padding:'6px 8px'}} value=${qbH} onChange=${e=>setQbH(e.target.value)}><option value="">Any QB</option>${qbOpts(h).map(o=>html`<option key=${o.pid} value=${o.pid}>${o.n}</option>`)}</select></div>
       <div className="fgrp"><span className="flbl">${abbr(a)} QB</span><select className="fx-search" style=${{padding:'6px 8px'}} value=${qbA} onChange=${e=>setQbA(e.target.value)}><option value="">Any QB</option>${qbOpts(a).map(o=>html`<option key=${o.pid} value=${o.pid}>${o.n}</option>`)}</select></div>
+      <div className="fgrp"><span className="flbl">${abbr(h)} QB</span><select className="fx-search" style=${{padding:'6px 8px'}} value=${qbH} onChange=${e=>setQbH(e.target.value)}><option value="">Any QB</option>${qbOpts(h).map(o=>html`<option key=${o.pid} value=${o.pid}>${o.n}</option>`)}</select></div>
     </div>
-    ${mode==='stats'?html`<${TeamStatsView} game=${game} rH=${rH} rA=${rA}/>`:html`<div>
+    ${mode==='stats'?html`<${TeamStatsView} game=${game} rH=${rH} rA=${rA} period=${period} off=${offTeam} setOff=${setOffTeam}/>`:html`<div>
     <div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:10,justifyContent:'center',marginBottom:8}}>
       <div className="fgrp"><span className="flbl">Time</span><${Seg} cls="oneline" items=${[['match','Match'],['q1','Q1'],['q2','Q2'],['h1','H1'],['q3','Q3'],['q4','Q4'],['h2','H2']]} value=${time} onChange=${setTime}/></div>
-      <div className="fgrp"><span className="flbl">Race to</span><${Seg} items=${[['5','5'],['10','10'],['15','15'],['20','20']]} value=${raceX} onChange=${setRaceX}/></div>
-      <div className="fgrp"><span className="flbl">Scoring Play</span><${Seg} items=${[['TD','TD'],['FG','FG'],['SFTY','SFTY']]} value=${spType} onChange=${setSpType}/></div>
     </div>
     <div style=${{display:'flex',alignItems:'center',marginBottom:8,gap:6}}>
-      <div style=${{flex:1,display:'flex',alignItems:'center',gap:6,padding:'8px 12px',borderRadius:8,background:`linear-gradient(90deg,${H},${hexA(H,0)} 96%)`,color:txtOn(H),fontWeight:800}}><${Badge} s=${h} cls="sm"/> ${h}</div>
+      <div style=${{flex:1,display:'flex',alignItems:'center',gap:6,padding:'8px 12px',borderRadius:8,background:`linear-gradient(90deg,${A},${hexA(A,0)} 96%)`,color:txtOn(A),fontWeight:800}}><${Badge} s=${a} cls="sm"/> ${nick(a)}</div>
       <div className="sub" style=${{padding:'0 6px',textAlign:'center'}}>${time==='match'?'Match':(time[0]==='q'?('Q'+time[1]):('H'+time[1]))} Markets</div>
-      <div style=${{flex:1,display:'flex',alignItems:'center',gap:6,justifyContent:'flex-end',padding:'8px 12px',borderRadius:8,background:`linear-gradient(270deg,${A},${hexA(A,0)} 96%)`,color:txtOn(A),fontWeight:800}}>${a} <${Badge} s=${a} cls="sm"/></div>
+      <div style=${{flex:1,display:'flex',alignItems:'center',gap:6,justifyContent:'flex-end',padding:'8px 12px',borderRadius:8,background:`linear-gradient(270deg,${H},${hexA(H,0)} 96%)`,color:txtOn(H),fontWeight:800}}>${nick(h)} <${Badge} s=${h} cls="sm"/></div>
     </div>
-    <div style=${{display:'grid',gridTemplateColumns:'44px 1fr minmax(140px,auto) 1fr 44px',alignItems:'center',gap:8,padding:'6px 2px'}}>
-      <div style=${{fontWeight:800,fontSize:12}}>${qH.length}</div><div></div><div style=${{textAlign:'center',fontSize:10.5,fontWeight:700,color:'#e8eef5'}}>GAMES</div><div></div><div style=${{textAlign:'right',fontWeight:800,fontSize:12}}>${qA.length}</div>
+    <div style=${{display:'grid',gridTemplateColumns:'46px 1fr minmax(130px,auto) 1fr 46px',alignItems:'center',gap:8,padding:'6px 2px'}}>
+      <div style=${{fontWeight:800,fontSize:12}}>${qA.length}</div><div></div><div style=${{textAlign:'center',fontSize:10.5,fontWeight:700,color:'#e8eef5'}}>GAMES</div><div></div><div style=${{textAlign:'right',fontWeight:800,fontSize:12}}>${qH.length}</div>
     </div>
-    ${time==='match'?mkRows.map(r=>html`<${Row} key=${r.key} label=${r.label} leftTxt=${pctT(r.hp)} rightTxt=${pctT(r.ap)} hfrac=${r.hp} afrac=${r.ap} hg=${r.hp!=null&&(r.ap==null||r.hp>=r.ap)&&r.hp>0} ag=${r.ap!=null&&(r.hp==null||r.ap>=r.hp)&&r.ap>0} adj=${r.adj} open=${open===r.key} onToggle=${()=>setOpen(open===r.key?null:r.key)}>
-      ${r.sl?html`<${LadderSlider} ...${r.sl}/>`:''}
-    </${Row}>`):''}
-    ${mktRows.filter(r=>!(time==='match'&&r.key==='win')).map(r=>{
-      const lt=html`<span>${pctT(r.hp)}</span>${r.oh?html`<span className="todd2" style=${{marginLeft:5,fontSize:9,padding:'0 4px'}}>${r.oh}</span>`:''}`;
-      const rt=html`${r.oa?html`<span className="todd2" style=${{marginRight:5,fontSize:9,padding:'0 4px'}}>${r.oa}</span>`:''}<span>${pctT(r.ap)}</span>`;
-      return html`<${Row} key=${r.key} label=${r.label} leftTxt=${lt} rightTxt=${rt} hfrac=${r.hp} afrac=${r.ap} hg=${r.hp!=null&&(r.ap==null||r.hp>=r.ap)&&r.hp>0} ag=${r.ap!=null&&(r.hp==null||r.ap>=r.hp)&&r.ap>0}/>`;})}
-    <div className="sub" style=${{textAlign:'center',marginTop:10}}>Strike rates over the filtered games · odds from Sportsbet Week 1${time==='match'?' · line/total sliders adjustable':''}.</div>
+    ${mktRows.map(r=>html`<${MarketRow} key=${r.key} row=${r} qH=${qH} qA=${qA} homeShort=${abbr(h)} awayShort=${abbr(a)}/>`)}
+    <div className="sub" style=${{textAlign:'center',marginTop:10}}>Strike rates over the filtered games · odds from Sportsbet Week 1.</div>
     </div>`}
     <div style=${{marginTop:14}}>
-      <${TeamLog} teamShort=${h} rows=${rH} mode=${logMode} setMode=${setLogMode} line=${homeLine} totalLine=${totLine} totdLine=${od&&od.totalTD?od.totalTD.line:null}/>
+      <${TeamLog} teamShort=${h} rows=${rH} mode=${mode==='stats'?(offTeam==='home'?'offence':'defence'):logMode} setMode=${setLogMode} line=${homeLine} totalLine=${totLine} totdLine=${od&&od.totalTD?od.totalTD.line:null} title=${logTitle(h,true,game,factors)}/>
       <div style=${{height:8}}></div>
-      <${TeamLog} teamShort=${a} rows=${rA} mode=${logMode} setMode=${setLogMode} line=${od&&od.spread&&od.spread.away?od.spread.away.line:-homeLine} totalLine=${totLine} totdLine=${od&&od.totalTD?od.totalTD.line:null}/>
+      <${TeamLog} teamShort=${a} rows=${rA} mode=${mode==='stats'?(offTeam==='away'?'offence':'defence'):logMode} setMode=${setLogMode} line=${od&&od.spread&&od.spread.away?od.spread.away.line:-homeLine} totalLine=${totLine} totdLine=${od&&od.totalTD?od.totalTD.line:null} title=${logTitle(a,false,game,factors)}/>
     </div>
   </div>`;
 }
@@ -2142,7 +2227,7 @@ const ODCOLS=[
  {h:'Rec 1D',m:'fdRec',o:'ofdRec'},{h:'Rush 1D',m:'fdRush',o:'ofdRush'}];
 function odCell(r,c,off){ if(c.mr||c.or){const p=off?c.mr:c.or;const a=r[p[0]],b=r[p[1]];if(a==null||b==null||!b)return '–';const v=a/b;return c.pct?Math.round(v*100)+'%':v.toFixed(c.dec||1);} const k=off?c.m:c.o;return r[k]!=null?r[k]:'–'; }
 const RSGGRN='#3ddc84', RSGRED='#ff6b81', RSGYEL='var(--ylw)';
-function TeamLog({teamShort,rows,mode,setMode,line,totalLine,totdLine}){
+function TeamLog({teamShort,rows,mode,setMode,line,totalLine,totdLine,title}){
   const [open,setOpen]=useState(true); const clr=color(teamShort);
   const shown=[...rows].reverse().slice(0,40);
   const isG=mode==='general';
@@ -2163,10 +2248,10 @@ function TeamLog({teamShort,rows,mode,setMode,line,totalLine,totdLine}){
     }};
   return html`<div className="fr">
     <div className="fr-h" style=${{background:`linear-gradient(90deg,${hexA(clr,0.92)},${hexA(clr,0.5)})`,color:txtOn(clr)}}>
-      <div className="fr-l" style=${{cursor:'pointer'}} onClick=${()=>setOpen(o=>!o)}><span className="fr-ar">${open?'▾':'▸'}</span><${Badge} s=${teamShort} cls="xs"/> ${teamShort} game log <span style=${{opacity:.85}}>· ${rows.length}</span></div>
-      <div className="seg oneline" style=${{transform:'scale(.9)'}} onClick=${e=>e.stopPropagation()}>${[['general','General'],['offence','Offence'],['defence','Defence']].map(([k,l])=>html`<button key=${k} className=${mode===k?'on':''} onClick=${()=>setMode(k)}>${l}</button>`)}</div>
+      <div className="fr-l" style=${{cursor:'pointer',minWidth:0}} onClick=${()=>setOpen(o=>!o)}><span className="fr-ar">${open?'▾':'▸'}</span><${Badge} s=${teamShort} cls="xs"/> <span className="tlog-title">${title||(nick(teamShort)+' Games')} (${rows.length})</span></div>
+      <select className="tlog-sel" value=${mode} onChange=${e=>setMode(e.target.value)} onClick=${e=>e.stopPropagation()}><option value="general">General</option><option value="offence">Offence</option><option value="defence">Defence</option></select>
     </div>
-    ${open?html`<div className="fr-log" style=${{maxHeight:360}}><table className="logtbl cfb wide"><thead><tr>${heads.map((h,i)=>html`<th key=${i} className=${h==='Opp'?'c-tm':''}>${h}</th>`)}</tr></thead>
+    ${open?html`<div className="fr-log" style=${{maxHeight:330}}><table className="logtbl cfb wide"><thead><tr>${heads.map((h,i)=>html`<th key=${i} className=${h==='Opp'?'c-tm':''}>${h}</th>`)}</tr></thead>
       <tbody>${shown.map((r,i)=>{const resClr=r.res==='W'?RSGGRN:r.res==='L'?RSGRED:RSGYEL;const off=mode==='offence';return html`<tr key=${i}>
         ${isG?heads.map((h,j)=>{if(h==='Opp')return html`<td key=${j} className="c-tm">${teamChipFull(r.opp)}</td>`;const c=genCell(r,h);return html`<td key=${j} style=${{color:c.c||'inherit',fontWeight:c.b?800:400}}>${c.v}</td>`;})
           :html`<td>${r.season}</td><td>${r.week||''}</td><td className="c-tm">${teamChipFull(r.opp)}</td><td>${(()=>{const f=gfac(teamShort,r.season,r.week);return f&&f.intl===1?"Int'l":(r.ha==='home'?'H':'A');})()}</td>
@@ -2305,7 +2390,7 @@ function FactorRow({label, desc, hr, mode, rows, sk, tab, ptdMap, base, poShow, 
       </tr>`;})}</tbody></table></div>`:''}
   </div>`;
 }
-function PlayerModal({p, game, initStat, initThr, initFactor, onClose}){
+function PlayerModal({p, game, initStat, initThr, initFactor, initPeriod, onClose}){
   const teamShort=p.team==='home'?game.home:game.away;
   const oppShort=p.team==='home'?game.away:game.home; const oppFull=fullOf(oppShort);
   const pos=p.pos||'WR';
@@ -2318,7 +2403,7 @@ function PlayerModal({p, game, initStat, initThr, initFactor, onClose}){
   const [sk,setSk]=useState(sk0);
   const [tabK,setTabK]=useState(initTabK);
   const [openFactor,setOpenFactor]=useState(initFactor||null);
-  const [period,setPeriod]=useState('2025');
+  const [period,setPeriod]=useState(initPeriod||'2025');
   const tabs=threshTabs(sk,prAll);
   const tab=tabs.find(t=>t.k===tabK)||tabs[0];
   function changeStat(k){setSk(k);setTabK(defTabK(k));}
@@ -2338,10 +2423,12 @@ function PlayerModal({p, game, initStat, initThr, initFactor, onClose}){
   const poolOK=(poolThr!=null)&&!!STATS[sk].pget&&['passYds','passTds','rushYds','rushAtt','rec','recYds','recLong','td'].includes(sk);
   const hrTP=poolOK?poolHR(tpRows,sk,{v:poolThr}):{n:0,hits:0,pct:null,sum:0};
   const hrPO=poolOK?poolHR(poRows,sk,{v:poolThr}):{n:0,hits:0,pct:null,sum:0};
+  const swShort={passYds:'pass yds',passTds:'pass TDs',rushYds:'rush yds',rushAtt:'att',rec:'recs',recYds:'rec yds',recLong:'yds'}[sk]||word;
   const desc=hr=>{ if(!hr.n) return '';
-    if(!tab.get) return 'Hit '+hr.hits+' of '+hr.n+' games';
-    if(sk==='td') return 'Scored '+Math.round(hr.sum)+' in '+hr.n+' games';
-    return 'Averaging '+Math.round(hr.sum/hr.n)+' '+word+' in '+hr.n+' games'; };
+    if(!tab.get) return hr.hits+'/'+hr.n+' apps';
+    if(sk==='td') return Math.round(hr.sum)+' TDs in '+hr.n+' apps';
+    const dec=(sk==='rec'||sk==='rushAtt'||sk==='passTds')?1:0;
+    return 'Avg '+(hr.sum/hr.n).toFixed(dec)+' '+swShort+' in '+hr.n+' apps'; };
   const selOdds=(tab.ou&&tab.over!=null)?{o:tab.over}:(tab.odds!=null?{o:tab.odds}:null);
   const mktLbl=(sk==='td')?(tab.label+' TD'):(tab.ou?('O '+tab.line+' '+STATS[sk].short):(tab.label+' '+STATS[sk].short));
   // unified match factors (same ids the insights use)
@@ -2364,7 +2451,7 @@ function PlayerModal({p, game, initStat, initThr, initFactor, onClose}){
           <div style=${{fontSize:20,fontWeight:900,lineHeight:1.1}}>${p.name}</div>
           <div style=${{fontSize:11,opacity:.96,fontWeight:600,marginTop:4,display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}><${Badge} s=${teamShort} cls="xs"/> ${nick(teamShort)} · ${p.depthRank||pos} · <span style=${{background:statusBg,color:txtOn(statusBg),fontWeight:800,fontSize:9.5,borderRadius:4,padding:'1px 6px'}}>${statusTxt}</span></div>
           ${selOdds?html`<div style=${{display:'flex',flexWrap:'wrap',alignItems:'center',gap:6,marginTop:6}}><span style=${{fontSize:11,fontWeight:800}}>${mktLbl}</span><span className="bkchip">${LOGOS.sportsbet?html`<img src=${LOGOS.sportsbet} alt="SB"/>`:''}<b>$${selOdds.o.toFixed(2)}</b></span></div>`:''}
-          <div style=${{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:5,marginTop:10}}>${tiles.map(([k,v],i)=>html`<div key=${i} style=${{background:'rgba(0,0,0,.24)',border:'1px solid rgba(255,255,255,.5)',borderRadius:6,padding:'5px 2px',textAlign:'center'}}><div style=${{fontSize:14,fontWeight:900}}>${v}</div><div style=${{fontSize:7.5,opacity:.85,fontWeight:700}}>${k}</div></div>`)}</div>
+          <div style=${{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:5,marginTop:10}}>${tiles.concat([['Day',(game.fac&&game.fac.dow)?(DOWNAMES[game.fac.dow]||game.fac.dow):'—']]).map(([k,v],i)=>html`<div key=${i} style=${{background:'rgba(0,0,0,.24)',border:'1px solid rgba(255,255,255,.5)',borderRadius:6,padding:'5px 2px',textAlign:'center'}}><div style=${{fontSize:13,fontWeight:900}}>${v}</div><div style=${{fontSize:7,opacity:.85,fontWeight:700}}>${k}</div></div>`)}</div>
         </div>
       </div>
       <div style=${{padding:'12px 14px'}}>
@@ -2419,6 +2506,26 @@ function DepthCharts({game, onOpen}){
 }
 
 // ---- match header ----
+const _standings=(()=>{ const rec={}; Object.keys(DIVS).forEach(t=>{const rows=(TLOGS[t]||[]).filter(r=>r.season===2025);let w=0,l=0;rows.forEach(r=>{if(r.res==='W')w++;else if(r.res==='L')l++;});rec[t]={w,l,pct:(w+l)?w/(w+l):0};});
+  const byDiv={}; Object.keys(DIVS).forEach(t=>{const d=DIVS[t].join(' ');(byDiv[d]=byDiv[d]||[]).push(t);});
+  Object.values(byDiv).forEach(ts=>{ts.sort((x,y)=>rec[y].pct-rec[x].pct);ts.forEach((t,i)=>rec[t].rank=i+1);});
+  return rec; })();
+const _ord=n=>n+({1:'st',2:'nd',3:'rd'}[n]||'th');
+function teamStand(t){const r=_standings[t],d=DIVS[t];return (r&&d)?(r.w+'-'+r.l+' | '+_ord(r.rank)+' in '+d[0]+' '+d[1]):'';}
+function GameSwitcher({gi,setGi}){
+  const [open,setOpen]=useState(false);
+  return html`<div style=${{marginTop:8,display:'flex',flexDirection:'column',alignItems:'center',position:'relative'}}>
+    <button className="gswitch-btn" onClick=${()=>setOpen(o=>!o)}>${open?'▴':'▾'} Change game</button>
+    ${open?html`<div className="gswitch-pop">${ORDER.map(i=>{const g=GAMES[i];const A=color(g.away),H=color(g.home);return html`<button key=${i} className=${'gbtn'+(i===gi?' on':'')} onClick=${()=>{setGi(i);setOpen(false);}} style=${{background:`linear-gradient(105deg,${A},${H})`,color:'#fff',display:'flex',flexDirection:'row',alignItems:'center',gap:4,padding:'5px 7px',justifyContent:'space-between'}}>
+      <${Badge} s=${g.away} cls="xs"/>
+      <div style=${{flex:1,minWidth:0,textShadow:'0 1px 2px rgba(0,0,0,.7)'}}>
+        <div style=${{fontSize:8,fontWeight:700,opacity:.95}}>${localKO(g.koUTC)}</div>
+        <div style=${{fontSize:9.5,fontWeight:800,whiteSpace:'nowrap'}}>${abbr(g.away)} ${g.fac&&g.fac.intl?'🌍':'@'} ${abbr(g.home)}</div>
+      </div>
+      <${Badge} s=${g.home} cls="xs"/>
+    </button>`;})}</div>`:''}
+  </div>`;
+}
 function rec2025(s){const rows=(TLOGS[s]||[]).filter(r=>r.season===2025);return {w:rows.filter(r=>r.res==='W').length,l:rows.filter(r=>r.res==='L').length};}
 function FormStrip({s}){const rows=(TLOGS[s]||[]).filter(r=>r.season===2025).slice(-5);return html`<div style=${{display:'flex',gap:3,justifyContent:'center'}}>${rows.map((r,i)=>html`<span key=${i} style=${{width:14,height:14,borderRadius:3,fontSize:8,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',background:r.res==='W'?'var(--acc2)':(r.res==='L'?'var(--red)':'var(--bg3)'),color:'#fff'}}>${r.res}</span>`)}</div>`;}
 const WKDAY=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -2435,9 +2542,8 @@ function wxEmoji(wx){ if(!wx)return '🌤️'; const s=wx.toLowerCase();
   if(s.includes('cloud')||s.includes('overcast'))return '☁️';
   if(s.includes('wind'))return '💨';
   return '🌤️'; }
-function MatchHeader({game}){
+function MatchHeader({game,gi,setGi}){
   const h=game.home,a=game.away,H=color(h),A=color(a);
-  const rh=rec2025(h),ra=rec2025(a);
   const od=game.odds;
   const spr=od&&od.spread||{}; const tot=od&&od.total;
   const favTxt=od&&od.spread&&od.spread.home&&od.spread.away?(od.spread.home.line<=0?`${abbr(h)} ${od.spread.home.line>0?'+':''}${od.spread.home.line}`:`${abbr(a)} ${od.spread.away.line>0?'+':''}${od.spread.away.line}`):'';
@@ -2449,31 +2555,27 @@ function MatchHeader({game}){
   if(tot) oline.push('Total '+tot.line);
   return html`<div>
     <div className="mh" style=${{background:`linear-gradient(105deg,${A} 0%,${A} 26%,${H} 74%,${H} 100%)`,display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center',gap:12,padding:16,borderRadius:12}}>
-      <div style=${{color:txtOn(A),textAlign:'center',minWidth:0}}><${Badge} s=${a} cls="gl"/><div className="mh-tn" style=${{fontWeight:800,fontSize:15,marginTop:4}}>${nick(a)}</div><div className="sub" style=${{color:'inherit',opacity:.9}}>'25: ${ra.w}-${ra.l}</div><${FormStrip} s=${a}/></div>
+      <div style=${{color:txtOn(A),textAlign:'center',minWidth:0}}><${Badge} s=${a} cls="gl"/><div className="mh-tn" style=${{fontWeight:800,fontSize:15,marginTop:4}}>${nick(a)}</div><div className="sub" style=${{color:'inherit',opacity:.9,fontSize:9.5}}>${teamStand(a)}</div><${FormStrip} s=${a}/></div>
       <div style=${{color:'#fff',textAlign:'center',minWidth:0,textShadow:'0 1px 3px rgba(0,0,0,.5)'}}>
-        <div className="mh-time" style=${{fontSize:16,fontWeight:900}}>${localKO(game.koUTC)}</div>
-        ${game.venue?html`<div className="mh-venue" style=${{fontSize:10.5,opacity:.9,marginTop:3,fontWeight:600}}>${game.venue}</div>`:''}
-        ${(game.city||game.wx)?html`<div className="mh-ko" style=${{fontSize:9.5,opacity:.85,marginTop:2,fontWeight:600}}>${game.city||''}${game.city&&game.wx?'  ·  ':''}${game.wx?wxEmoji(game.wx)+' '+game.wx:''}</div>`:''}
-        ${(game.fac&&game.fac.intl)?html`<div style=${{marginTop:5}}><span className="odchip" style=${{background:'rgba(255,210,63,.22)',borderColor:'#ffd23f'}}>🌍 INTERNATIONAL</span></div>`:''}
-        ${od&&oline.length?html`<div className="mh-odln" style=${{fontSize:11.5,fontWeight:700,marginTop:6}}>${oline.join('  ·  ')}</div>`:html`<div className="mh-odds" style=${{fontSize:10,fontWeight:700,marginTop:5,opacity:.75}}>odds TBD</div>`}
+        <div className="mh-time" style=${{fontSize:15,fontWeight:900}}>${localKO(game.koUTC)}</div>
+        ${(game.venue||game.wx)?html`<div className="mh-venue" style=${{fontSize:10,opacity:.9,marginTop:3,fontWeight:600}}>${game.venue||''}${game.venue&&game.wx?'  ·  ':''}${game.wx?wxEmoji(game.wx)+' '+game.wx:''}</div>`:''}
+        ${od&&oline.length?html`<div className="mh-odln" style=${{fontSize:9.5,fontWeight:700,marginTop:5,lineHeight:1.35}}>${oline.join('  ·  ')}</div>`:html`<div className="mh-odds" style=${{fontSize:10,fontWeight:700,marginTop:5,opacity:.75}}>odds TBD</div>`}
+        ${setGi?html`<${GameSwitcher} gi=${gi} setGi=${setGi}/>`:''}
       </div>
-      <div style=${{color:txtOn(H),textAlign:'center',minWidth:0}}><${Badge} s=${h} cls="gl"/><div className="mh-tn" style=${{fontWeight:800,fontSize:15,marginTop:4}}>${nick(h)}</div><div className="sub" style=${{color:'inherit',opacity:.9}}>'25: ${rh.w}-${rh.l}</div><${FormStrip} s=${h}/></div>
+      <div style=${{color:txtOn(H),textAlign:'center',minWidth:0}}><${Badge} s=${h} cls="gl"/><div className="mh-tn" style=${{fontWeight:800,fontSize:15,marginTop:4}}>${nick(h)}</div><div className="sub" style=${{color:'inherit',opacity:.9,fontSize:9.5}}>${teamStand(h)}</div><${FormStrip} s=${h}/></div>
     </div>
   </div>`;
 }
 
 // ---- insights: streak of 5+ OR an (n-1)/n ratio (3/4,4/5,5/6,...) ----
 function evalSeq(seq){
-  const n=seq.length; if(n<4) return null;
+  const n=seq.length; if(n<5) return null;
   let streak=0; for(const h of seq){ if(h)streak++; else break; }
-  let form=null; // largest window (>=4) with exactly one miss
-  for(let w=Math.min(n,12); w>=4; w--){ const hits=seq.slice(0,w).filter(Boolean).length; if(hits===w-1){ form={w,hits}; break; } }
-  const cands=[];
-  if(streak>=5) cands.push({streak,pure:true,win:streak,hits:streak,pct:1});
-  if(form) cands.push({streak,pure:false,win:form.w,hits:form.hits,pct:form.hits/form.w});
-  if(!cands.length) return null;
-  cands.sort((a,b)=>insScore(b)-insScore(a));
-  return cands[0];
+  if(streak>=5) return {streak,pure:true,win:streak,hits:streak,pct:1}; // prioritise a live 5+ streak
+  let form=null; // largest window (>=5) with exactly one miss -> 4/5, 5/6, ...
+  for(let w=Math.min(n,14); w>=5; w--){ const hits=seq.slice(0,w).filter(Boolean).length; if(hits===w-1){ form={w,hits}; break; } }
+  if(form) return {streak,pure:false,win:form.w,hits:form.hits,pct:form.hits/form.w};
+  return null;
 }
 function insScore(i){ return i.hits*1000 + (i.pure?400:0) + (30-i.win)*8 + i.pct*5; }
 function InsFire({streak,pure}){ return (pure&&streak>=3)?html`<span className="ins-fire">🔥${streak}</span>`:''; }
@@ -2509,7 +2611,7 @@ function playerInsights(game, statList){
       let bestForStat=null;
       insSteps(p.pid,sk).forEach(step=>{
         const odds=insMarketOdds(p.pid,sk,step.v);
-        if(odds==null||odds<1.40) return; // qualifying odds only
+        if(odds==null||odds<1.50) return; // qualifying odds only
         let bestFac=null;
         facs.forEach(f=>{ const seq=ownSeq(p.gl,f.pred,sk,step); const ev=evalSeq(seq); if(!ev)return; if(!bestFac||insScore(ev)>insScore(bestFac.ev))bestFac={...f,ev}; });
         if(!bestFac) return;
@@ -2522,18 +2624,20 @@ function playerInsights(game, statList){
     cands.sort((a,b)=>insScore(b)-insScore(a));
     cands.slice(0,3).forEach(c=>out.push(c));
   });
-  return out.sort((a,b)=>insScore(b)-insScore(a));
+  return out.sort((a,b)=>(b.pct-a.pct)||(b.hits-a.hits)||(insScore(b)-insScore(a)));
 }
+// pick a period whose window fits the insight's game count
+function insPeriod(win){ return win<=5?'5':win<=10?'10':win<=20?'20':'2025'; }
 function pInsSentence(i){ const cnt=i.pure?('in each of his last '+i.streak):('in '+i.hits+' of his last '+i.win); return i.verb+' '+cnt+' '+i.phrase; }
 function insOdds(i){ const pr=i.p&&PROPS[i.p.pid]; if(!pr||!i.step)return null; const tv=i.step.v;
   const L=pr.lines&&pr.lines[LINEKEY[i.sk]]; if(L){const a=altAt(L.alt,tv);return a?a.pr:null;}
   if(i.sk==='td'){return {1:pr.atd,2:pr.td2,3:pr.td3}[tv]||null;} return null; }
 function PlayerInsTile({i,onOpen}){
   const clr=color(i.teamShort); const od=i.odds!=null?i.odds:insOdds(i);
-  return html`<div className="ins-tile" style=${{background:`linear-gradient(90deg,${hexA(clr,0.26)},${hexA(clr,0.06)})`,borderColor:hexA(clr,0.4)}} onClick=${()=>onOpen(i)}>
-    <div className="ins-l" style=${{background:clr}}><img className="ins-photo" src=${photoUrl(i.p&&i.p.pid)} alt=${i.name} onError=${e=>{e.target.onerror=null;e.target.src=logo(i.teamShort);e.target.classList.add('islogo');}}/></div>
+  return html`<div className="ins-tile" style=${{background:clr,borderColor:'#fff',color:txtOn(clr)}} onClick=${()=>onOpen(i)}>
+    <div className="ins-l" style=${{background:'rgba(0,0,0,.18)'}}><img className="ins-photo" src=${photoUrl(i.p&&i.p.pid)} alt=${i.name} onError=${e=>{e.target.onerror=null;e.target.src=logo(i.teamShort);e.target.classList.add('islogo');}}/></div>
     <div className="ins-r">
-      <div className="ins-name"><${InsFire} streak=${i.streak} pure=${i.pure}/>${i.name}</div>
+      <div className="ins-name"><${InsFire} streak=${i.streak} pure=${i.pure}/>${abbrName(i.name)}</div>
       <div className="ins-mkt">${i.label}</div>
       <div className="ins-stat">${pInsSentence(i)}</div>
       ${od?html`<div className="bkchip ins-bk">${LOGOS.sportsbet?html`<img src=${LOGOS.sportsbet} alt="SB"/>`:''}<b>$${od.toFixed(2)}</b></div>`:''}
@@ -2550,11 +2654,11 @@ function InsHeader({open,setOpen,streaksOnly,setStreaksOnly}){
 function InsightsSection({game,onOpenPlayer,statList}){
   const [open,setOpen]=useState(true); const [so,setSo]=useState(false);
   const all=useMemo(()=>playerInsights(game,statList),[game,statList]);
-  const list=(so?all.filter(i=>i.pure):all).filter(i=>i.odds!=null&&i.odds>=1.40).slice(0,15);
+  const list=(so?all.filter(i=>i.pure):all).filter(i=>i.odds!=null&&i.odds>=1.50).slice(0,15);
   if(!all.length) return '';
   return html`<div className="kins">
     <${InsHeader} open=${open} setOpen=${setOpen} streaksOnly=${so} setStreaksOnly=${setSo}/>
-    ${open?html`<div className="kins-body">${list.length?html`<div className="ins-grid">${list.map((i,x)=>html`<${PlayerInsTile} key=${x} i=${i} onOpen=${()=>onOpenPlayer(i.p,i.sk,String(i.step.v),game,i.factor)}/>`)}</div>`:html`<div className="sub" style=${{padding:'6px 2px'}}>No qualifying streaks.</div>`}</div>`:''}
+    ${open?html`<div className="kins-body">${list.length?html`<div className="ins-grid">${list.map((i,x)=>html`<${PlayerInsTile} key=${x} i=${i} onOpen=${()=>onOpenPlayer(i.p,i.sk,String(i.step.v),game,i.factor,insPeriod(i.win))}/>`)}</div>`:html`<div className="sub" style=${{padding:'6px 2px'}}>No qualifying streaks.</div>`}</div>`:''}
   </div>`;
 }
 
@@ -2601,7 +2705,7 @@ function teamInsights(game){
   [[game.home,true],[game.away,false]].forEach(([teamShort,isHome])=>{
     const rows=(TEAMQ[teamShort]||[]).slice().sort((x,y)=>(x.s-y.s)||(x.w-y.w));
     const fams=teamMarketFams(game,teamShort,isHome); const facs=teamFactors(game,teamShort,isHome);
-    fams.forEach(fm=>{ if(fm.odds==null||fm.odds<1.40) return; let best=null;
+    fams.forEach(fm=>{ if(fm.odds==null||fm.odds<1.50) return; let best=null;
       facs.forEach(fc=>{ const sample=rows.filter(fc.pred); const seq=sample.slice().reverse().map(fm.hit); const ev=evalSeq(seq); if(!ev)return;
         const cand={teamShort,isHome,fam:fm.fam,label:fm.label,verb:fm.verb,odds:fm.odds,hit:fm.hit,stat:fm.stat,col:fm.col,rows:sample,factor:fc.fid,phrase:fc.ph,...ev};
         if(!best||insScore(cand)>insScore(best))best=cand; });
@@ -2645,7 +2749,7 @@ function TeamInsModal({i,onClose}){ const clr=color(i.teamShort),tc=txtOn(clr);
 function TeamInsightsSection({game}){
   const [open,setOpen]=useState(true); const [so,setSo]=useState(false); const [modal,setModal]=useState(null);
   const all=useMemo(()=>teamInsights(game),[game]);
-  const list=(so?all.filter(i=>i.pure):all).filter(i=>i.odds!=null&&i.odds>=1.40).slice(0,15);
+  const list=(so?all.filter(i=>i.pure):all).filter(i=>i.odds!=null&&i.odds>=1.50).slice(0,15);
   if(!all.length) return '';
   return html`<div className="kins">
     ${modal?html`<${TeamInsModal} i=${modal} onClose=${()=>setModal(null)}/>`:''}
@@ -2775,13 +2879,12 @@ function fname(p,sc,onOpen){
 }
 // name with team logo + availability status (status shown by default on table tiles)
 function fnameL(p,sc,onOpen,showAvail=true){
-  const aw=availWord(p.inj);
-  const priceTxt=sc==='sc'?(p.price?money(p.price):''):(p.slOwn!=null?p.slOwn.toFixed(1)+'% own':'');
+  const priceTxt=sc==='sc'?(p.price?money(p.price):''):'';
   const sub=[p.tm+' · '+p.pos, priceTxt].filter(Boolean).join(' · ');
-  return html`<span style=${{display:'inline-flex',alignItems:'center',gap:7,textAlign:'left'}}>
+  return html`<span style=${{display:'inline-flex',alignItems:'center',gap:6,textAlign:'left'}}>
     <${Badge} s=${p.tm} cls="xs"/>
-    <span><b className="fx-nmlink" onClick=${e=>{e.stopPropagation();onOpen&&onOpen(p);}}>${rName(p.n)}</b>
-      <div className="sub">${sub}${showAvail?html` · <span style=${{color:aw.c,fontWeight:800}}>${aw.t}</span>`:''}</div></span></span>`;
+    <span><span style=${{display:'inline-flex',alignItems:'center',gap:5}}><b className="fx-nmlink" onClick=${e=>{e.stopPropagation();onOpen&&onOpen(p);}}>${rName(p.n)}</b>${showAvail?html`<${AvailIcon} inj=${p.inj}/>`:''}</span>
+      <div className="sub">${sub}</div></span></span>`;
 }
 function FxTable({cols,rows,onOpen,sc}){
   return html`<div className="fx-wrap six"><table className="fxtbl center"><thead><tr>${cols.map((c,i)=>html`<th key=${i} className="fx-th" style=${{textAlign:c.a||'center'}}>${c.l}</th>`)}</tr></thead>
@@ -2801,7 +2904,7 @@ function explorerCols(sc,pos){
   const S=(pos==='ALL'?ALLSTATS:posStats(pos,sc)).map(([k,l,d])=>({k,l,d,v:(p,st)=>st[FS[k]]}));
   return base.concat(plat,S);
 }
-const FZ=[{w:34,l:'#'},{w:30,l:''},{w:172,l:'Player'},{w:44,l:'+'}]; // rank, logo, player, compare
+const FZ=[{w:30,l:'#'},{w:26,l:''},{w:116,l:'Player'},{w:36,l:'+'}]; // rank, logo, player, compare
 function PlayerExplorer({sc,onOpen,cmp,toggleCmp,period,setPeriod}){
   const [pos,setPos]=useState('ALL');
   const [q,setQ]=useState('');
@@ -2828,12 +2931,11 @@ function PlayerExplorer({sc,onOpen,cmp,toggleCmp,period,setPeriod}){
       <div className="fgrp"><span className="flbl">Period</span><${Seg} items=${XPER} value=${period} onChange=${setPeriod}/></div>
       <input className="fx-search" placeholder="Search…" value=${q} onInput=${e=>setQ(e.target.value.toLowerCase())}/>
     </div>
-    <div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:16,justifyContent:'center',alignItems:'center',marginBottom:12}}>
-      ${sc==='sc'?html`<div className="fgrp sldr-box"><span className="flbl">Max Price ${maxPrice}M</span><input type="range" min="1" max="31" step="0.5" value=${maxPrice} onInput=${e=>setMaxPrice(+e.target.value)} className="slider" style=${{width:150}}/></div>
-        <div className="fgrp sldr-box"><span className="flbl">Max Own ${maxOwn}%</span><input type="range" min="0" max="100" step="1" value=${maxOwn} onInput=${e=>setMaxOwn(+e.target.value)} className="slider" style=${{width:150}}/></div>`
-      :html`<div className="fgrp sldr-box"><span className="flbl">Max Rostered ${maxOwn}%</span><input type="range" min="0" max="100" step="1" value=${maxOwn} onInput=${e=>setMaxOwn(+e.target.value)} className="slider" style=${{width:170}}/></div>`}
-    </div>
-    <div className="stit" style=${{justifyContent:'space-between'}}>Player Explorer <span className="sub">${rows.length} players · ${period}${sc==='sl'?' · Sleeper ownership modelled':''}</span></div>
+    ${sc==='sc'?html`<div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:10,justifyContent:'center',alignItems:'center',marginBottom:12}}>
+      <div className="fgrp sldr-box"><span className="flbl">Max Price ${maxPrice}M</span><input type="range" min="1" max="31" step="0.5" value=${maxPrice} onInput=${e=>setMaxPrice(+e.target.value)} className="slider" style=${{width:130}}/></div>
+      <div className="fgrp sldr-box"><span className="flbl">Max Own ${maxOwn}%</span><input type="range" min="0" max="100" step="1" value=${maxOwn} onInput=${e=>setMaxOwn(+e.target.value)} className="slider" style=${{width:130}}/></div>
+    </div>`:''}
+    <div className="stit">Player Explorer</div>
     <div className="fx-scroll"><table className="fxtbl center frozen"><thead><tr>
       ${fzTh(0,'#')}${fzTh(1,'')}${fzTh(2,html`<span style=${{float:'left'}}>Player</span>`)}${fzTh(3,'+')}
       <th className="fx-th">Pos</th><th className="fx-th">Av</th><th className="fx-th">Opp</th>
@@ -3022,12 +3124,12 @@ function FanFactorRow({label,note,items,sc,stcols,pool}){
       <div className="fr-l"><span className="fr-ar">${g?(open?'▾':'▸'):''}</span>${label}</div>
       <div className="fr-r"><span className="fr-desc sub">${note||g+'g'}</span><b className="hr" style=${{fontSize:15,marginLeft:9,color:g?scClr(a):'var(--t3)'}}>${g?a.toFixed(1):'–'}</b></div>
     </div>
-    ${open&&g?html`<div className="fr-log"><table className="logtbl cfb fixed"><thead><tr>
-      ${pool?html`<th className="c-nm">Player</th><th>Sea</th><th>Wk</th><th>${isVs?'Tm':'Opp'}</th>`:html`<th>Sea</th><th>Wk</th><th>Opp</th><th>H/A</th>`}
+    ${open&&g?html`<div className="fr-log"><table className=${'logtbl cfb '+(pool?'wide':'fixed')}><thead><tr>
+      ${pool?html`<th>Sea</th><th>Wk</th><th className="c-nm">Player</th><th>${isVs?'Tm':'Opp'}</th>`:html`<th>Sea</th><th>Wk</th><th>Opp</th><th>H/A</th>`}
       <th className="sel">${sc==='sc'?'SC':'SL'}</th>${cols.map((c,i)=>html`<th key=${i}>${GLSHORT[c[1]]||c[1]}</th>`)}</tr></thead>
       <tbody>${show.map((it,i)=>{const r=it.r;const v=scoreOf(it);return html`<tr key=${i}>
-        ${pool?html`<td className="c-nm" style=${{textAlign:'left',overflow:'hidden',textOverflow:'ellipsis'}}>${abbrName(it.n)}</td><td>'${String(glf(r,'s')).slice(2)}</td><td>${glf(r,'w')}</td><td className="c-tm">${teamChip(isVs?it.tm:glf(r,'opp'))}</td>`
-          :html`<td>'${String(glf(r,'s')).slice(2)}</td><td>${glf(r,'w')}</td><td className="c-tm">${teamChip(glf(r,'opp'))}</td><td>${glf(r,'ha')}</td>`}
+        ${pool?html`<td>${glf(r,'s')}</td><td>${glf(r,'w')}</td><td className="c-nm">${abbrName(it.n)}</td><td className="c-tm">${teamChip(isVs?it.tm:glf(r,'opp'))}</td>`
+          :html`<td>${glf(r,'s')}</td><td>${glf(r,'w')}</td><td className="c-tm">${teamChip(glf(r,'opp'))}</td><td>${glf(r,'ha')}</td>`}
         <td className="sel" style=${{color:scClr(v),fontWeight:800}}>${sc==='sc'?v:v.toFixed(1)}</td>
         ${cols.map((c,j)=>html`<td key=${j}>${nn(glStat(r,c[0]),0)}</td>`)}
       </tr>`;})}</tbody></table></div>`:''}
@@ -3076,6 +3178,7 @@ function FantasyModal({p,scoring,onClose}){
   const tiles=base.map(t=>[t[0],t[1],'']);
   tiles.push(['Pos Rank', ranks.posRank?('#'+ranks.posRank):'–', '', posRankClr(ranks.posRank,ranks.posTotal)]);
   tiles.push(['Opp v '+p.pos, ranks.oppRank?('#'+ranks.oppRank):'–', '', oppRankClr(ranks.oppRank)]);
+  const _fac=W1FAC[p.tm]||{}; tiles.push(['Day', _fac.dow?(DOWNAMES[_fac.dow]||_fac.dow):'—']);
   // ----- factor rows -----
   const own=(rs)=>rs.map(r=>({r}));
   const fAll=own(rows);
@@ -3116,13 +3219,11 @@ function FantasyModal({p,scoring,onClose}){
           <div style=${{fontSize:20,fontWeight:900,lineHeight:1.1}}>${p.n}</div>
           <div style=${{fontSize:11,opacity:.96,fontWeight:600,marginTop:4,display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
             <${Badge} s=${p.tm} cls="xs"/> ${nick(p.tm)} · ${drpos(p.dr)} · ${sc==='sc'?money(p.price):(p.slOwn!=null?p.slOwn.toFixed(1)+'% own':'')}
-            <span style=${{background:aw.c,color:'#0b0b0b',fontWeight:800,fontSize:9.5,borderRadius:4,padding:'1px 6px'}}>${aw.t}</span>
-            ${w1opp?html`<span style=${{opacity:.9}}>· Wk1 ${w1ha==='H'?'vs':'@'} ${nick(w1opp)}</span>`:''}</div>
+            <span style=${{background:aw.c,color:'#0b0b0b',fontWeight:800,fontSize:9.5,borderRadius:4,padding:'1px 6px'}}>${aw.t}</span></div>
           <div style=${{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:5,marginTop:9}}>${tiles.map(([kk,v,sub,col],i)=>html`<div key=${i} style=${{background:'rgba(0,0,0,.24)',border:'1px solid rgba(255,255,255,.5)',borderRadius:6,padding:'5px 2px',textAlign:'center'}}><div style=${{fontSize:14,fontWeight:900,color:col||'#fff'}}>${v}<span style=${{fontSize:8.5,fontWeight:700,opacity:.7}}>${sub||''}</span></div><div style=${{fontSize:7.5,opacity:.85,fontWeight:700}}>${kk}</div></div>`)}</div>
         </div>
       </div>
       <div style=${{padding:'12px 14px'}}>
-        <${PropStrip} pid=${p.pid} pos=${p.pos}/>
         <div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:10,justifyContent:'center',alignItems:'flex-end',marginBottom:12}}>
           <div className="fgrp"><span className="flbl">Scoring</span><${Seg} items=${[['sc','SuperCoach'],['sl','Sleeper']]} value=${sc} onChange=${setSc}/></div>
           <div className="fgrp"><span className="flbl">Period</span><${Seg} items=${[['All','All'],['2025','2025'],['L10','L10'],['L5','L5'],['L3','L3']]} value=${period} onChange=${setPeriod}/></div>
@@ -3131,7 +3232,6 @@ function FantasyModal({p,scoring,onClose}){
         <${FanFactorRow} label="Home Games" items=${fHome} sc=${sc} stcols=${stcols}/>
         <${FanFactorRow} label="Away Games" items=${fAway} sc=${sc} stcols=${stcols}/>
         ${w1opp?html`<${FanFactorRow} label=${'vs '+nick(w1opp)} items=${fVs} sc=${sc} stcols=${stcols}/>`:''}
-        ${ctxRows.length?html`<div className="sub" style=${{margin:'10px 0 5px',fontWeight:700,letterSpacing:'.4px'}}>MATCH FACTORS</div>`:''}
         ${ctxRows.map((c,i)=>html`<${FanFactorRow} key=${'cx'+i} label=${c.l} items=${c.items} sc=${sc} stcols=${stcols}/>`)}
         <div style=${{height:1,background:'var(--brd)',margin:'10px 0'}}></div>
         <${FanFactorRow} label=${nick(p.tm)+' '+plural} note=${'position group'} items=${teamPool} sc=${sc} stcols=${stcols} pool=${true}/>
@@ -3142,8 +3242,8 @@ function FantasyModal({p,scoring,onClose}){
 }
 
 // ---------- Fantasy Hub shell ----------
-const FSUBS_SC=[['trading','Trading Block'],['pod','POD / Captains'],['fixtures','Fixtures'],['injury','Injury Ward'],['picks','Picks'],['teams','Best Teams']];
-const FSUBS_SL=[['trading','Trading Block'],['fixtures','Fixtures'],['injury','Injury Ward'],['picks','Picks'],['teams','Best Teams']];
+const FSUBS_SC=[['trading','Trades'],['fixtures','Fixtures'],['injury','Injury'],['picks','Picks'],['teams','Best Teams']];
+const FSUBS_SL=FSUBS_SC;
 function FantasyHub({sc,setSc}){
   const [sub,setSub]=useState('trading');
   const [cmp,setCmp]=useState([]);
@@ -3182,28 +3282,22 @@ function App(){
   const [fanSc,setFanSc]=useState('sc');
   const [modal,setModal]=useState(null);
   const game=GAMES[gi];
-  const openPlayer=(p,stat,thr,gm,factor)=>setModal({p,stat:stat||'rec',thr:(thr==null?null:thr),factor:factor||null,game:gm||game});
+  const openPlayer=(p,stat,thr,gm,factor,period)=>setModal({p,stat:stat||'rec',thr:(thr==null?null:thr),factor:factor||null,period:period||null,game:gm||game});
   const insStatList = tab==='fantasy' ? [fanMetric] : COMP_STATS;
   return html`<div>
-    <div className="hdr"><div className="hdr-in">
+    <div className="hdr"><div className="hdr-in hdr-compact">
       <div className="logo-t">🏈 <span className="logo-b">NFL</span> Fantasy Hub</div>
-      ${view==='fantasy'?html`<div className="hdr-sc" style=${{marginLeft:'auto'}}><${Seg} items=${[['sc','SuperCoach'],['sl','Sleeper']]} value=${fanSc} onChange=${setFanSc}/></div>`:''}
-      <div className="tab-nav" style=${{marginLeft:view==='fantasy'?'10px':'auto'}}>
-        ${[['round','Round'],['fantasy','Fantasy Hub']].map(([k,l])=>html`<button key=${k} className=${'tab-btn'+(view===k?' on':'')} onClick=${()=>setView(k)}>${l}</button>`)}
+      <div style=${{marginLeft:'auto',display:'flex',alignItems:'center',gap:8}}>
+        ${view==='fantasy'?html`<div className="hdr-sc"><${Seg} items=${[['sc','SC'],['sl','SL']]} value=${fanSc} onChange=${setFanSc}/></div>`:''}
+        <div className="tab-nav">
+          ${[['round','Round'],['fantasy','Fantasy']].map(([k,l])=>html`<button key=${k} className=${'tab-btn'+(view===k?' on':'')} onClick=${()=>setView(k)}>${l}</button>`)}
+        </div>
       </div>
     </div>
-    ${view==='round'?html`<div className="gsel nfl8" style=${{gridTemplateColumns:'repeat(8,1fr)',maxWidth:1320}}>${ORDER.map(i=>{const g=GAMES[i];const A=color(g.away),H=color(g.home);return html`<button key=${i} className=${'gbtn'+(i===gi?' on':'')} onClick=${()=>setGi(i)} style=${{background:`linear-gradient(105deg,${A},${H})`,color:'#fff',display:'flex',flexDirection:'row',alignItems:'center',gap:4,padding:'5px 7px',justifyContent:'space-between'}}>
-      <${Badge} s=${g.away} cls="xs"/>
-      <div style=${{flex:1,minWidth:0,textShadow:'0 1px 2px rgba(0,0,0,.7)'}}>
-        <div style=${{fontSize:8,fontWeight:700,opacity:.95}}>${localKO(g.koUTC)}</div>
-        <div style=${{fontSize:9.5,fontWeight:800,whiteSpace:'nowrap'}}>${abbr(g.away)} ${g.fac&&g.fac.intl?'🌍':'@'} ${abbr(g.home)}</div>
-      </div>
-      <${Badge} s=${g.home} cls="xs"/>
-    </button>`;})}</div>`:''}
     </div>
     <div className="ctr">
       ${view==='fantasy'?html`<${FantasyHub} onOpen=${openPlayer} sc=${fanSc} setSc=${setFanSc}/>`:html`<div>
-      <${MatchHeader} game=${game}/>
+      <${MatchHeader} game=${game} gi=${gi} setGi=${setGi}/>
       <${DepthCharts} game=${game} onOpen=${openPlayer}/>
       <div className="subtabs">${[['player','Player Stats'],['team','Team Stats'],['fantasy','Fantasy Stats']].map(([k,l])=>html`<button key=${k} className=${'subtab'+(tab===k?' on':'')} onClick=${()=>setTab(k)}>${l}</button>`)}</div>
       ${tab==='fantasy'?html`<div className="ctrls" style=${{display:'flex',justifyContent:'center',marginBottom:10}}>
@@ -3213,7 +3307,7 @@ function App(){
         :html`<${StatsTab} key=${fanMetric} game=${game} onOpen=${openPlayer} statOrder=${[fanMetric]} initStat=${fanMetric} fantasy=${true}/>`}
       </div>`}
     </div>
-    ${modal?html`<${PlayerModal} p=${modal.p} game=${modal.game} initStat=${modal.stat} initThr=${modal.thr} initFactor=${modal.factor} onClose=${()=>setModal(null)}/>`:''}
+    ${modal?html`<${PlayerModal} p=${modal.p} game=${modal.game} initStat=${modal.stat} initThr=${modal.thr} initFactor=${modal.factor} initPeriod=${modal.period} onClose=${()=>setModal(null)}/>`:''}
   </div>`;
 }
 ReactDOM.createRoot(document.getElementById('root')).render(html`<${App}/>`);
