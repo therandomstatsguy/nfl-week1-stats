@@ -1141,8 +1141,9 @@ input[type=range]{accent-color:#e92d2b!important}
 .ins-l .ins-photo.islogo{object-fit:contain;padding:9px;width:auto;margin:auto}
 /* fantasy hub */
 .fx-search{background:var(--bg1);border:1px solid #e92d2b;color:#fff;border-radius:8px;padding:7px 11px;font-size:12px;min-width:180px;font-family:inherit}
-.qbsel{text-align:center;text-align-last:center}
+.qbsel{text-align:center;text-align-last:center;min-width:0}
 .qbsel option{background:#1a1c22;color:#fff;font-weight:600;text-align:left}
+.mdl-odds-lbl{font-size:11px}
 .fx-wrap{overflow-x:auto;border:1px solid var(--brd);border-radius:10px;max-height:640px}
 .fxtbl{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
 .fxtbl th{position:sticky;top:0;background:#02326a;color:#fff;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;padding:8px 8px;white-space:nowrap;z-index:2}
@@ -1244,6 +1245,14 @@ input[type=range]{accent-color:#e92d2b!important}
  .fx-search{width:100%}
  .sldr-box{width:100%}.sldr-box .slider{width:100%!important}
  .hdr-sc{width:auto;margin:0}
+ .qbsel{font-size:11px!important;padding:5px 4px!important}
+ .mdl-odds{gap:4px}
+ .mdl-odds-lbl{font-size:9.5px}
+ .mdl-odds .bkchip{padding:1px 5px;gap:3px}
+ .mdl-odds .bkchip b{font-size:9px}
+ .mdl-odds .bkchip img{height:9px}
+ .mdl-odds .bkchip small{font-size:8.5px}
+ .modal-ov .seg button{font-size:9.5px!important;padding:4px 4px!important;white-space:nowrap}
 }
 /* compact header: keep toggle on the title line */
 .hdr-compact{flex-wrap:nowrap;align-items:center;gap:8px}
@@ -2342,9 +2351,11 @@ function TeamUnified({game}){
       <div className="fgrp" style=${{flex:1}}><${MultiSeg} items=${facItems} values=${factors} onToggle=${toggleFactor}/></div>
     </div>
     <div className="ctrls statflt" style=${{display:'flex',flexWrap:'wrap',gap:10,justifyContent:'center',alignItems:'stretch',marginBottom:12}}>
-      <div className="fgrp" style=${{flex:1}}><select className="fx-search qbsel" style=${{padding:'6px 8px',width:'100%',background:color(a),color:txtOn(color(a)),border:'1.5px solid #fff',fontWeight:700}} value=${qbA} onChange=${e=>setQbA(e.target.value)}><option value="">Any ${nick(a)} QB</option>${qbOpts(a).map(o=>html`<option key=${o.pid} value=${o.pid}>${o.n}</option>`)}</select></div>
-      <div className="fgrp" style=${{flex:1}}><${Seg} items=${PERIODS} value=${period} onChange=${setPeriod}/></div>
-      <div className="fgrp" style=${{flex:1}}><select className="fx-search qbsel" style=${{padding:'6px 8px',width:'100%',background:color(h),color:txtOn(color(h)),border:'1.5px solid #fff',fontWeight:700}} value=${qbH} onChange=${e=>setQbH(e.target.value)}><option value="">Any ${nick(h)} QB</option>${qbOpts(h).map(o=>html`<option key=${o.pid} value=${o.pid}>${o.n}</option>`)}</select></div>
+      <div className="fgrp" style=${{flex:1,minWidth:0}}><select className="fx-search qbsel" style=${{padding:'6px 8px',width:'100%',background:color(a),color:txtOn(color(a)),border:'1.5px solid #fff',fontWeight:700}} value=${qbA} onChange=${e=>setQbA(e.target.value)}><option value="">Any ${abbr(a)} QB</option>${qbOpts(a).map(o=>html`<option key=${o.pid} value=${o.pid}>${o.n}</option>`)}</select></div>
+      <div className="fgrp" style=${{flex:1,minWidth:0}}><select className="fx-search qbsel" style=${{padding:'6px 8px',width:'100%',background:color(h),color:txtOn(color(h)),border:'1.5px solid #fff',fontWeight:700}} value=${qbH} onChange=${e=>setQbH(e.target.value)}><option value="">Any ${abbr(h)} QB</option>${qbOpts(h).map(o=>html`<option key=${o.pid} value=${o.pid}>${o.n}</option>`)}</select></div>
+    </div>
+    <div className="ctrls" style=${{display:'flex',justifyContent:'center',marginBottom:12}}>
+      <div className="fgrp" style=${{flex:1,maxWidth:520}}><${Seg} cls="fitw" items=${PERIODS} value=${period} onChange=${setPeriod}/></div>
     </div>
     ${mode==='stats'?html`<${TeamStatsView} game=${game} rH=${rH} rA=${rA} period=${period} off=${offTeam} setOff=${setOffTeam}/>`:html`<div>
     <div className="ctrls" style=${{display:'flex',flexWrap:'wrap',gap:10,justifyContent:'center',marginBottom:8}}>
@@ -2615,7 +2626,7 @@ function PlayerModal({p, game, initStat, initThr, initFactor, initPeriod, onClos
             const sbChip=pr=>html`<span className="bkchip">${LOGOS.sportsbet?html`<img src=${LOGOS.sportsbet} alt="SB"/>`:''}<b>$${pr.toFixed(2)}</b></span>`;
             const ndChip=pr=>html`<span className="bkchip ndchip">${LOGOS.neds?html`<img src=${LOGOS.neds} alt="Neds"/>`:''}<b>$${pr.toFixed(2)}</b></span>`;
             const alt=(book,line)=>html`<span className="bkchip${book==='nd'?' ndchip':''}"><small style=${{opacity:.85,fontWeight:700}}>O</small><b>${line}</b>${(book==='nd'?LOGOS.neds:LOGOS.sportsbet)?html`<img src=${book==='nd'?LOGOS.neds:LOGOS.sportsbet} alt=""/>`:''}</span>`;
-            const wrap=(lbl,body)=>html`<div style=${{display:'flex',flexWrap:'wrap',alignItems:'center',gap:6,marginTop:6}}><span style=${{fontSize:11,fontWeight:800}}>${lbl}</span>${body}</div>`;
+            const wrap=(lbl,body)=>html`<div className="mdl-odds" style=${{display:'flex',flexWrap:'wrap',alignItems:'center',gap:6,marginTop:6}}><span className="mdl-odds-lbl" style=${{fontWeight:800}}>${lbl}</span>${body}</div>`;
             if(qMode) return selOdds?wrap(mktLbl,sbChip(selOdds.o)):'';
             let sb,nd;
             if(tab.ou){ const s=sbOU(p.pid,sk), d=ndOU(p.pid,sk); sb=s?{p:s.over,line:s.line}:null; nd=d?{p:d.over,line:d.line}:null; }
@@ -3267,12 +3278,12 @@ function InjuryWard({sc,onOpen}){
 function Picks({sc,onOpen}){
   if(sc==='sc'){
     const hp=PLAYERS.filter(p=>p.projSC!=null).sort((a,b)=>b.projSC-a.projSC).slice(0,20);
-    const val=PLAYERS.filter(p=>p.projSC!=null&&p.price).map(p=>({...p,val:p.projSC/(p.price/1e6)})).sort((a,b)=>b.val-a.val).slice(0,20);
+    const cap=PLAYERS.filter(p=>p.capt!=null).sort((a,b)=>b.capt-a.capt).slice(0,20);
     return html`<div className="cols2">
       <div><div className="stit" title="Week 1 SuperCoach">Highest Projected</div>
         <${FxTable} onOpen=${onOpen} cols=${[{l:'#',r:rankCell},{l:'Player',a:'left',r:r=>fnameL(r,sc,onOpen)},{l:'Opp',r:r=>oppCell(r.tm)},{l:'Proj',r:r=>nn(r.projSC)}]} rows=${hp}/></div>
-      <div><div className="stit" title="projected points per $M">Best Value</div>
-        <${FxTable} onOpen=${onOpen} cols=${[{l:'#',r:rankCell},{l:'Player',a:'left',r:r=>fnameL(r,sc,onOpen)},{l:'Opp',r:r=>oppCell(r.tm)},{l:'Val',r:r=>r.val.toFixed(2)}]} rows=${val}/></div>
+      <div><div className="stit" title="most captained this week">Captain Picks</div>
+        <${FxTable} onOpen=${onOpen} cols=${[{l:'#',r:rankCell},{l:'Player',a:'left',r:r=>fnameL(r,sc,onOpen)},{l:'Opp',r:r=>oppCell(r.tm)},{l:'CPT %',r:r=>r.capt.toFixed(1)}]} rows=${cap}/></div>
     </div>`;
   }
   const hp=PLAYERS.filter(p=>p.projSL!=null).sort((a,b)=>b.projSL-a.projSL).slice(0,20);
@@ -3306,12 +3317,12 @@ function BestTeams({sc,onOpen}){
   if(sc==='sc'){
     return html`<div className="cols2">
       <${TeamCard} title="Most Owned Team" kind="owned" note="Highest total ownership within cap · QB/RBx4/WRx6/TEx2/K/DST/Flex + reserve QB/RBx2/WRx2/TE/K/DST" squad=${FTEAMS.scOwned||[]} sc=${sc} onOpen=${onOpen} cap=${FA.cap}/>
-      <${TeamCard} title="Best Possible Team" kind="best" note="Highest projected within cap · captain (C) & VC = top-2 projected starters" squad=${FTEAMS.scBest||[]} sc=${sc} onOpen=${onOpen} cap=${FA.cap}/>
+      <${TeamCard} title="Best Team" kind="best" note="Highest projected within cap · captain (C) & VC = top-2 projected starters" squad=${FTEAMS.scBest||[]} sc=${sc} onOpen=${onOpen} cap=${FA.cap}/>
     </div>`;
   }
   return html`<div className="cols2">
     <${TeamCard} title="Most Started Team" kind="owned" note="Most popular · 1QB/2RB/2WR/1TE/1K/1DST/2FLEX · no salary cap" squad=${FTEAMS.slStarted||[]} sc=${sc} onOpen=${onOpen} cap=${0}/>
-    <${TeamCard} title="Best Possible Team" kind="best" note="Highest projected · 1QB/2RB/2WR/1TE/1K/1DST/2FLEX · no salary cap" squad=${FTEAMS.slBest||[]} sc=${sc} onOpen=${onOpen} cap=${0}/>
+    <${TeamCard} title="Best Team" kind="best" note="Highest projected · 1QB/2RB/2WR/1TE/1K/1DST/2FLEX · no salary cap" squad=${FTEAMS.slBest||[]} sc=${sc} onOpen=${onOpen} cap=${0}/>
   </div>`;
 }
 
