@@ -1924,7 +1924,8 @@ function periodRows(gl,period){ if(!gl||!gl.length)return[]; if(period==='all')r
 function factorRows(gl,pred,period){ let a=(gl||[]).filter(pred); if(period==='2025')a=a.filter(r=>r[GX.sea]===2025); else if(period!=='all')a=a.slice(-(+period)); return a; }
 function poolPeriod(rows,period){ if(!rows||!rows.length)return[]; if(period==='all')return rows; if(period==='2025')return rows.filter(r=>r[PI.date].slice(0,4)==='2025'); const n=+period; const dates=[...new Set(rows.map(r=>r[PI.date]))].sort(); const keep=new Set(dates.slice(-n)); return rows.filter(r=>keep.has(r[PI.date])); }
 function computeHR(rows,get,step){ let hits=0,sum=0; for(const r of rows){const v=get(r)||0;sum+=v;if(v>=step.v)hits++;} return {n:rows.length,hits,pct:rows.length?hits/rows.length:null,sum}; }
-function poolHR(rows,sk,step){ const getv=STATS[sk].pget; const by={}; for(const r of rows){const d=r[PI.date];const v=getv(r)||0;by[d]=(d in by)?by[d]+v:v;} const vals=Object.values(by); let hits=0,sum=0;for(const v of vals){sum+=v;if(v>=step.v)hits++;} return {n:vals.length,hits,pct:vals.length?hits/vals.length:null,sum}; }
+// per-GAME strike rate: for each opponent game (date), take the best position player's value; count games where a position player reached the milestone
+function poolHR(rows,sk,step){ const getv=STATS[sk].pget; const by={}; for(const r of rows){const d=r[PI.date];const v=getv(r)||0;by[d]=(d in by)?Math.max(by[d],v):v;} const vals=Object.values(by); let hits=0,sum=0;for(const v of vals){sum+=v;if(v>=step.v)hits++;} return {n:vals.length,hits,pct:vals.length?hits/vals.length:null,sum}; }
 
 // ---- controls ----
 function Seg({items,value,onChange,cls}){ return html`<div className=${'seg '+(cls||'')}>${items.map(([v,l])=>html`<button key=${v} className=${value===v?'on':''} onClick=${()=>onChange(v)}>${l}</button>`)}</div>`; }
@@ -1936,7 +1937,7 @@ function ThreshSlider({sk,idx,setIdx}){ const {steps}=stepsOf(sk); const cur=ste
 // ---- player tile ----
 function PlayerTile({p, sk, tab, period, side, onOpen, fantasy, factorPred, qN, fanColor}){
   const qMode=qN>0;
-  const rows=periodRows(p.gl, period).filter(factorPred||(()=>true));
+  const rows=factorRows(p.gl, factorPred||(()=>true), period); // filter by factor first, then take last-N
   const ptdMap=(sk==='td')?tdPtdMap(p.pid):null;
   const fanMode=fantasy&&tab&&(tab.avg||tab.proj);
   let hits=0; const n=rows.length; if(!fanMode) rows.forEach(r=>{if(qMode?qTileHit(sk,tab,r,p.pid,qN):tileHit(sk,tab,r,p.pid,ptdMap))hits++;});
@@ -2008,7 +2009,7 @@ function StatsTab({game, onOpen, statOrder, initStat, fantasy}){
     const teamShort=sideKey==='home'?game.home:game.away;
     let list=Object.values(game.players).filter(p=>p.team===sideKey&&p.gl&&p.gl.length&&(fantasy||(qMode?qHasOdds(p.pid,skEff,qN):hasOdds(p.pid,skEff))));
     list.forEach(p=>{p._home=game.home;p._away=game.away;});
-    const rankFor=p=>{const rows=periodRows(p.gl,period).filter(statFacPred(game,p,factor));
+    const rankFor=p=>{const rows=factorRows(p.gl,statFacPred(game,p,factor),period); // last-N of the filtered factor
       if(fantasy&&tab&&tab.proj){const fp=FPROJ[p.pid];return fp?(fp[skEff==='scPts'?'sc':'sl']||0):-1;}
       if(!rows.length)return -1;
       if(fantasy&&tab&&tab.avg){const vv=rows.map(r=>STATS[skEff].get(r)||0);return vv.reduce((a,b)=>a+b,0)/vv.length;}
@@ -2099,7 +2100,7 @@ function teamRowPred(game,teamShort,isHome,factors){
     else if(f==='dn')P.push(r=>{const x=gf(r);return !!(x&&x.dn===(fac.dn||'D'));});
     else if(f==='ro')P.push(r=>{const x=gf(r);return !!(x&&x.ro===(fac.ro||'out'));});
     else if(f==='conf')P.push(r=>{const os=SHORT_OF_FULL[r.opp];return confOf(os)===oppConf;});
-    else if(f==='div')P.push(r=>{const os=SHORT_OF_FULL[r.opp];return sameDiv(teamShort,os);});
+    else if(f==='div')P.push(r=>{const os=SHORT_OF_FULL[r.opp];return sameDiv(os,oppShort);}); // games vs the opponent's division
     else if(f==='dow')P.push(r=>{const x=gf(r);return !!(x&&fac.dow&&x.dow===fac.dow);});
     else if(f==='oppform')P.push(r=>{const os=SHORT_OF_FULL[r.opp];const wp=seasonWinPct(os,r.season);return wp!=null&&(oppOver?wp>=0.5:wp<0.5);});
   });
@@ -2120,7 +2121,7 @@ function teamRowPredQ(game,teamShort,isHome,factors){
     else if(f==='dn')P.push(r=>{const x=gf(r);return !!(x&&x.dn===(fac.dn||'D'));});
     else if(f==='ro')P.push(r=>{const x=gf(r);return !!(x&&x.ro===(fac.ro||'out'));});
     else if(f==='conf')P.push(r=>confOf(r.opp)===oppConf);
-    else if(f==='div')P.push(r=>sameDiv(teamShort,r.opp));
+    else if(f==='div')P.push(r=>sameDiv(r.opp,oppShort)); // games vs the opponent's division
     else if(f==='dow')P.push(r=>{const x=gf(r);return !!(x&&fac.dow&&x.dow===fac.dow);});
     else if(f==='oppform')P.push(r=>{const wp=seasonWinPct(r.opp,r.s);return wp!=null&&(oppOver?wp>=0.5:wp<0.5);});
   });
@@ -2315,7 +2316,7 @@ function logTitle(team,isHome,game,factors){
     if(f==='ha') pre.push(fac.intl?"Int'l":(fac.neu?'Neutral':(isHome?'Home':'Away')));
     else if(f==='dn') pre.push(fac.dn==='N'?'Night':'Day');
     else if(f==='ro') pre.push(fac.ro==='in'?'Indoor':'Outdoor');
-    else if(f==='div') pre.push('Divisional');
+    else if(f==='div'){ if(sameDiv(team,oppShort)) pre.push('Divisional'); else post.push('vs '+divName(oppShort)); }
     else if(f==='dow') pre.push(fac.dow||'');
     else if(f==='fav') post.push('as '+(isFav?'Favourite':'Underdog'));
     else if(f==='h2h') post.push('vs '+nick(oppShort));
@@ -2353,7 +2354,7 @@ function TeamUnified({game}){
   const mktRows=teamMarketRows(time,qH,qA,game,od);
   const facItems=[['all','All'],['h2h','H2H'],['ha',fac.intl?"Int'l":(fac.neu?'Neutral':'H/A')],['fav','Fav/Und'],
     ['dn',fac.dn==='N'?'Night':'Day'],['ro',fac.ro==='in'?'Indoor':'Outdoor'],
-    ['conf','vs Conf'],['div','vs Div'],['dow',fac.dow||'DoW'],['oppform','Opp Form']];
+    ['conf','vs Conf'],['div',sameDiv(h,a)?'Divisional':'Opp Div'],['dow',fac.dow||'DoW'],['oppform','Opp Form']];
   const qbOpts=team=>((DEPTH[team]&&DEPTH[team].QB)||[]).map(x=>({pid:x[4],n:x[1]}));
   return html`<div>
     <div className="ctrls" style=${{display:'flex',justifyContent:'center',marginBottom:10}}>
@@ -2451,6 +2452,7 @@ const DIVS={
  ARI:['NFC','West'],LAR:['NFC','West'],SF:['NFC','West'],SEA:['NFC','West']};
 const confOf=s=>DIVS[s]?DIVS[s][0]:'';
 const sameDiv=(a,b)=>!!(DIVS[a]&&DIVS[b]&&DIVS[a][0]===DIVS[b][0]&&DIVS[a][1]===DIVS[b][1]);
+const divName=s=>DIVS[s]?DIVS[s].join(' '):''; // e.g. 'AFC East'
 const _srec={};
 function seasonWinPct(team,season){ if(!team)return null; const k=team+'_'+season; if(k in _srec)return _srec[k];
   const rows=(TLOGS[team]||[]).filter(r=>r.season===season&&!r.wlab); let w=0,n=0; rows.forEach(r=>{if(r.res==='W')w++; if(r.res==='W'||r.res==='L')n++;}); const v=n?w/n:null; _srec[k]=v; return v; }
@@ -2471,7 +2473,7 @@ function playerFactors(p,game){
   if(fac.dow) F.push({fid:'dow',label:(DOWNAMES[fac.dow]||fac.dow)+' Games',ph:(DOWNAMES[fac.dow]||fac.dow)+' games',pred:r=>{const f=facOf(r);return !!(f&&f.dow===fac.dow);}});
   F.push({fid:'dn',label:fac.dn==='N'?'Night Games':'Day Games',ph:fac.dn==='N'?'night games':'day games',pred:r=>{const f=facOf(r);return !!(f&&f.dn===(fac.dn||'D'));}});
   F.push({fid:'ro',label:fac.ro==='in'?'Indoor Venues':'Outdoor Venues',ph:fac.ro==='in'?'indoor games':'outdoor games',pred:r=>{const f=facOf(r);return !!(f&&f.ro===(fac.ro||'out'));}});
-  F.push({fid:'div',label:'Divisional Games',ph:'divisional games',pred:r=>{const os=SHORT_OF_FULL[r[GX.opp]];return sameDiv(teamShort,os);}});
+  F.push({fid:'div',label:sameDiv(teamShort,oppShort)?'Divisional Games':('vs '+divName(oppShort)),ph:sameDiv(teamShort,oppShort)?'divisional games':('games vs '+divName(oppShort)+' teams'),pred:r=>{const os=SHORT_OF_FULL[r[GX.opp]];return sameDiv(os,oppShort);}});
   if(oppConf) F.push({fid:'conf',label:'vs '+oppConf+' Teams',ph:'games vs '+oppConf+' teams',pred:r=>{const os=SHORT_OF_FULL[r[GX.opp]];return confOf(os)===oppConf;}});
   F.push({fid:'rec500',label:oppRecOver?'vs Teams Over .500':'vs Teams Under .500',ph:'games vs teams '+(oppRecOver?'over':'under')+' .500',pred:r=>{const os=SHORT_OF_FULL[r[GX.opp]];const wp=seasonWinPct(os,r[GX.sea]);return wp!=null&&(oppRecOver?wp>=0.5:wp<0.5);}});
   if(p.pos!=='QB'&&qb1&&qb1.pid) F.push({fid:'qb1',label:'With '+abbrName(qb1.n),ph:'games with '+abbrName(qb1.n),pred:r=>r[GX.qb]===qb1.pid});
@@ -2934,7 +2936,7 @@ function teamFactors(game,teamShort,isHome){
   else F.push({fid:'ha',ph:isHome?'home games':'away games',pred:r=>r.ha===haChar});
   F.push({fid:'vs',ph:'games vs '+abbr(oppShort),pred:r=>r.opp===oppShort});
   if(fac.favTeam) F.push({fid:'fav',ph:isFav?'games as favourite':'games as underdog',pred:r=>{const f=gf(r);return !!(f&&f.fav===(isFav?1:0));}});
-  F.push({fid:'div',ph:'divisional games',pred:r=>sameDiv(teamShort,r.opp)});
+  F.push({fid:'div',ph:sameDiv(teamShort,oppShort)?'divisional games':('games vs '+divName(oppShort)+' teams'),pred:r=>sameDiv(r.opp,oppShort)});
   if(oppConf) F.push({fid:'conf',ph:'games vs '+oppConf+' teams',pred:r=>confOf(r.opp)===oppConf});
   F.push({fid:'rec500',ph:'games vs teams '+(oppRecOver?'over':'under')+' .500',pred:r=>{const wp=seasonWinPct(r.opp,r.s);return wp!=null&&(oppRecOver?wp>=0.5:wp<0.5);}});
   F.push({fid:'dn',ph:fac.dn==='N'?'night games':'day games',pred:r=>{const f=gf(r);return !!(f&&f.dn===(fac.dn||'D'));}});
